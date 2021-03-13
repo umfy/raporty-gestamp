@@ -1,7 +1,7 @@
-var Raport = require('../models/raport')
-var Inspection = require('../models/inspection')
+const Raport = require('../models/raport')
+const Inspection = require('../models/inspection')
 
-var async = require('async')
+const async = require('async')
 
 // Display list of all raports.
 exports.raport_list = function (req, res, next) {

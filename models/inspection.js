@@ -1,8 +1,8 @@
-var mongoose = require('mongoose')
+const mongoose = require('mongoose')
 
-var Schema = mongoose.Schema
+const Schema = mongoose.Schema
 
-var InspectionSchema = new Schema({
+const InspectionSchema = new Schema({
    kettle: { type: String },
    compressor: { type: String },
    ice: { type: String },

@@ -1,8 +1,8 @@
-var mongoose = require('mongoose')
+const mongoose = require('mongoose')
 
-var Schema = mongoose.Schema
+const Schema = mongoose.Schema
 
-var DeviceSchema = new Schema({
+const DeviceSchema = new Schema({
    name: { type: String, required: true, maxlength: 100 },
    ip: { type: String, maxlength: 50 },
    line: { type: Schema.Types.ObjectId, ref: 'Line', required: true },

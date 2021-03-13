@@ -1,18 +1,18 @@
-var mongoose = require('mongoose')
+const mongoose = require('mongoose')
 
-var Schema = mongoose.Schema
+const Schema = mongoose.Schema
 
-var UserSchema = new Schema({
+const UserSchema = new Schema({
    name: { type: String, required: true, maxlength: 100 },
    surname: { type: String, required: true, maxlength: 100 },
-   email: { type: String, required: true, maxlength: 100 },
+   email: { type: String, maxlength: 100 },
    spec: { type: String, maxlength: 100 },
    isTech: { type: Boolean },
    isAdmin: { type: Boolean },
 })
 
 // Virtual for user's full name
-UserSchema.virtual('displayname').get(function () {
+UserSchema.virtual('fullname').get(function () {
    return this.name + ', ' + this.surname
 })
 

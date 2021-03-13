@@ -1,4 +1,4 @@
-var User = require('../models/user')
+const User = require('../models/user')
 
 // Display list of all searchs.
 exports.search_page_get = function (req, res) {

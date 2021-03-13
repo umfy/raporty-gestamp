@@ -1,19 +1,15 @@
-var express = require('express')
-var router = express.Router()
+const express = require('express')
+const router = express.Router()
 
-var plan_controller = require('../controllers/planController')
-var raport_controller = require('../controllers/raportController')
-var search_controller = require('../controllers/searchController')
-var users_controller = require('../controllers/userController')
-var device_controller = require('../controllers/deviceController')
+const plan_controller = require('../controllers/planController')
+const raport_controller = require('../controllers/raportController')
+const search_controller = require('../controllers/searchController')
+const user_controller = require('../controllers/userController')
+const device_controller = require('../controllers/deviceController')
+const devicetype_controller = require('../controllers/devicetypeController')
+const line_controller = require('../controllers/lineController')
 
 /// DEVICE ROUTES ///
-
-// GET request for list of all device items
-router.get('/device', device_controller.device_list)
-
-// GET request for one device item
-router.get('/device/:id', device_controller.device_detail)
 
 // GET request for creating new device
 router.get('/device/create', device_controller.device_create_get)
@@ -33,13 +29,77 @@ router.get('/device/:id/update', device_controller.device_update_get)
 // POST request to update device
 router.post('/device/:id/update', device_controller.device_update_post)
 
+// GET request for list of all device items
+router.get('/device', device_controller.device_list)
+
+// GET request for one device item
+router.get('/device/:id', device_controller.device_detail)
+
+/// DEVICETYPE ROUTES ///
+
+// GET request for creating new devicetype
+router.get('/devicetype/create', devicetype_controller.devicetype_create_get)
+
+// POST request for creating new devicetype
+router.post('/devicetype/create', devicetype_controller.devicetype_create_post)
+
+// GET request to delete devicetype
+router.get(
+   '/devicetype/:id/delete',
+   devicetype_controller.devicetype_delete_get
+)
+
+// POST request to delete devicetype
+router.post(
+   '/devicetype/:id/delete',
+   devicetype_controller.devicetype_delete_post
+)
+
+// GET request to update devicetype
+router.get(
+   '/devicetype/:id/update',
+   devicetype_controller.devicetype_update_get
+)
+
+// POST request to update devicetype
+router.post(
+   '/devicetype/:id/update',
+   devicetype_controller.devicetype_update_post
+)
+
+// GET request for list of all device items
+router.get('/devicetype', devicetype_controller.devicetype_list)
+
+// GET request for one devicetype item
+router.get('/devicetype/:id', devicetype_controller.devicetype_detail)
+
+/// LINE ROUTES ///
+
+// GET request for creating new line
+router.get('/line/create', line_controller.line_create_get)
+
+// POST request for creating new line
+router.post('/line/create', line_controller.line_create_post)
+
+// GET request to delete line
+router.get('/line/:id/delete', line_controller.line_delete_get)
+
+// POST request to delete line
+router.post('/line/:id/delete', line_controller.line_delete_post)
+
+// GET request to update line
+router.get('/line/:id/update', line_controller.line_update_get)
+
+// POST request to update line
+router.post('/line/:id/update', line_controller.line_update_post)
+
+// GET request for list of all device items
+router.get('/line', line_controller.line_list)
+
+// GET request for one device item
+router.get('/line/:id', line_controller.line_detail)
+
 /// PLAN-OWANE PRACE ROUTES ///
-
-// GET request for list of all prace plan-owane items
-router.get('/plan', plan_controller.plan_list)
-
-// GET request for one plan item
-router.get('/plan/:id', plan_controller.plan_detail)
 
 // GET request for creating new plan
 router.get('/plan/create', plan_controller.plan_create_get)
@@ -59,14 +119,15 @@ router.get('/plan/:id/update', plan_controller.plan_update_get)
 // POST request to update plan
 router.post('/plan/:id/update', plan_controller.plan_update_post)
 
+// GET request for list of all prace plan-owane items
+router.get('/plan', plan_controller.plan_list)
+
+// GET request for one plan item
+router.get('/plan/:id', plan_controller.plan_detail)
+
 /// RAPORT ROUTES ///
 
 // GET request for list of all raport items
-// pagination later ! -> view 10 latest raports
-router.get('/raport', raport_controller.raport_list)
-
-// GET request for one raport item
-router.get('/raport/:id', raport_controller.raport_detail)
 
 // GET request for creating new raport
 router.get('/raport/create', raport_controller.raport_create_get)
@@ -86,6 +147,12 @@ router.get('/raport/:id/update', raport_controller.raport_update_get)
 // POST request to update raport
 router.post('/raport/:id/update', raport_controller.raport_update_post)
 
+// pagination later ! -> view 10 latest raports
+router.get('/raport', raport_controller.raport_list)
+
+// GET request for one raport item
+router.get('/raport/:id', raport_controller.raport_detail)
+
 /// SEARCH ROUTES ///
 
 // GET request for search page
@@ -96,28 +163,28 @@ router.post('/search', search_controller.search_page_post)
 
 /// USERS  ROUTES ///
 
-// GET request for list of all users items
-router.get('/users', users_controller.users_list)
+// GET request for creating new user
+router.get('/user/create', user_controller.user_create_get)
 
-// GET request for one users item
-router.get('/users/:id', users_controller.users_detail)
+// POST request for creating new user
+router.post('/user/create', user_controller.user_create_post)
 
-// GET request for creating new users
-router.get('/users/create', users_controller.users_create_get)
+// GET request to delete user
+router.get('/user/:id/delete', user_controller.user_delete_get)
 
-// POST request for creating new users
-router.post('/users/create', users_controller.users_create_post)
+// POST request to delete user
+router.post('/user/:id/delete', user_controller.user_delete_post)
 
-// GET request to delete users
-router.get('/users/:id/delete', users_controller.users_delete_get)
+// GET request to update user
+router.get('/user/:id/update', user_controller.user_update_get)
 
-// POST request to delete users
-router.post('/users/:id/delete', users_controller.users_delete_post)
+// POST request to update user
+router.post('/user/:id/update', user_controller.user_update_post)
 
-// GET request to update users
-router.get('/users/:id/update', users_controller.users_update_get)
+// GET request for list of all user items
+router.get('/user', user_controller.user_list)
 
-// POST request to update users
-router.post('/users/:id/update', users_controller.users_update_post)
+// GET request for one user item
+router.get('/user/:id', user_controller.user_detail)
 
 module.exports = router

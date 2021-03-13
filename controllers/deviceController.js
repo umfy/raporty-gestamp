@@ -1,4 +1,4 @@
-var Device = require('../models/device.js')
+const Device = require('../models/device')
 
 // Display list of all devices.
 exports.device_list = function (req, res) {

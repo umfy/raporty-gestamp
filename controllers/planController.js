@@ -1,4 +1,4 @@
-var Plan = require('../models/plan.js')
+const Plan = require('../models/plan')
 
 // Display list of all plans.
 exports.plan_list = function (req, res) {

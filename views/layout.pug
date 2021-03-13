@@ -15,20 +15,29 @@ html(lang='en')
           block sidebar
             ul(class='sidebar-nav')
               li
+                a(href='/api/raport') Home
+              li
                 a(href='/api/raport/create', target='_blank') Nowy Raport
               li
                 a(href='/api/search') Wyszukiwanie
-              li
-                a(href='api/plan')  Prace Planowane
-              li
-                a(href='/api/device') Urządzenia
               hr
               li
-                a(href='api/plan') Dodaj Prace Planowane
+                a(href='/api/plan')  Prace Planowane
               li
-                a(href='api/device/create') Dodaj Urządzenie
+                a(href='/api/device') Urządzenia
               li
-                a(href='api/users') Pracownicy (Admin)
+                a(href='/api/line') Linie
+              li
+                a(href='/api/user') Pracownicy
+              hr
+              li
+                a(href='/api/plan/create') Dodaj Prace Planowane
+              li
+                a(href='/api/device/create') Dodaj Urządzenie
+              li
+                a(href='/api/line/create') Dodaj Linię
+              li
+                a(href='/api/user/create') Dodaj Pracownika
             
 
         div(class='col-sm-10')

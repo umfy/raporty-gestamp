@@ -1,8 +1,8 @@
-var mongoose = require('mongoose')
+const mongoose = require('mongoose')
 
-var Schema = mongoose.Schema
+const Schema = mongoose.Schema
 
-var RaportSchema = new Schema({
+const RaportSchema = new Schema({
    date: { type: Date, required: true },
    shift: { type: Number, required: true },
    users: [{ type: Schema.Types.ObjectId, ref: 'User' }],

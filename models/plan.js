@@ -1,8 +1,8 @@
-var mongoose = require('mongoose')
+const mongoose = require('mongoose')
 
-var Schema = mongoose.Schema
+const Schema = mongoose.Schema
 
-var PlanSchema = new Schema({
+const PlanSchema = new Schema({
    desc: { type: String, required: true },
    date_created: { type: Date, required: true },
    date_execution: { type: Date },
