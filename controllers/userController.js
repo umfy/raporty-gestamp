@@ -42,15 +42,31 @@ exports.user_create_get = function (req, res) {
 exports.user_create_post = [
    // Validate and sanitise fields.
 
-   body('name', 'Należy podać imię.').trim().isLength({ min: 1 }).escape(),
-   body('surname', 'Należy podać nazwisko.')
+   body('name')
       .trim()
       .isLength({ min: 1 })
-      .escape(),
-   body('email').escape(),
+      .escape()
+      .withMessage('Imię jest wymagane')
+      .bail()
+      .isAlphanumeric()
+      .withMessage('Imię nie może zawierać znaków innych niż alfanumeryczne'),
+   body('surname')
+      .trim()
+      .isLength({ min: 1 })
+      .escape()
+      .withMessage('Nazwisko jest wymagane')
+      .bail()
+      .isAlphanumeric()
+      .withMessage(
+         'Nazwisko nie może zawierać znaków innych niż alfanumeryczne'
+      ),
+   body('email', 'Adres email jest nieprawidłowy')
+      .optional({ checkFalsy: true })
+      .isEmail()
+      .normalizeEmail(),
    body('spec').escape(),
-   body('isTech').escape(),
-   body('isAdmin').escape(),
+   body('isTech').toBoolean(),
+   body('isAdmin').toBoolean(),
 
    // Process request after validation and sanitization.
    (req, res, next) => {
@@ -74,8 +90,8 @@ exports.user_create_post = [
             surname: req.body.surname,
             email: req.body.email,
             spec: req.body.spec,
-            isTech: req.body.isTech == true,
-            isAdmin: req.body.isAdmin == true,
+            isTech: req.body.isTech,
+            isAdmin: req.body.isAdmin,
          })
          user.save(function (err) {
             if (err) {

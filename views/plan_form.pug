@@ -1,0 +1,38 @@
+extends layout
+
+block content
+
+   h1 #{title}
+   form(method='POST' action='')
+      div.form-group
+         label(for='desc') Opis:
+         input#name.form-control(type='text', name='desc', value=(undefined===plan ? '' : plan.desc))
+         
+         label(for='date_execution') Planowana data wykonania:
+         input#date_execution.form-control(type='date' name='date_execution' value=(undefined===plan ? '' : plan.virtual_date_execution) )
+        
+         label(for='shift') Numer zmainy:
+         select#shift.form-control(type='select', placeholder='Wybierz' name='shift' )
+
+            for item in shift_names
+               if plan
+                  option(value=(item==='Popołudniowa' ? 2 : (item==='Nocna' ? 3 : 1) ) selected=(plan.virtual_num_to_word===item) ? 'selected' : false) #{item}
+               else
+                  option(value=(item==='Popołudniowa' ? 2 : (item==='Nocna' ? 3 : 1) )) #{item}
+
+
+         label(for='user') Zlecający:
+         select#user.form-control(type='select', placeholder='Wybierz autora' name='user' )
+            for user in user_list
+               if plan
+                  option(value=user._id selected=(user._id.toString()===plan.user._id.toString() ? 'selected' : false )) #{user.fullname}
+               else
+                  option(value=user._id) #{user.fullname}
+
+      button.btn.btn-primary(type='submit') Submit
+  
+
+   if errors
+      ul
+         for error in errors
+            li!=error.msg

@@ -1,0 +1,11 @@
+extends layout
+
+block content
+   h1= title
+
+   ul 
+      each devicetype in devicetype_list
+         li
+            a(href=devicetype.url) #{devicetype.name}
+      else
+         li There are no devicetypes.

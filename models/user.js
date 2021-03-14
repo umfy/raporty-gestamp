@@ -13,7 +13,7 @@ const UserSchema = new Schema({
 
 // Virtual for user's full name
 UserSchema.virtual('fullname').get(function () {
-   return this.name + ', ' + this.surname
+   return this.surname + ', ' + this.name
 })
 
 // Virtual for user's URL

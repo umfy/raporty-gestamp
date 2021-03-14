@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { DateTime } = require('luxon')
 
 const Schema = mongoose.Schema
 
@@ -9,7 +10,15 @@ const PlanSchema = new Schema({
    shift: { type: Number },
    isDone: { type: Boolean, required: true },
    comments: { type: String },
-   created_by: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+})
+
+PlanSchema.virtual('virtual_date_execution').get(function () {
+   return DateTime.fromJSDate(this.date_execution).toISODate(DateTime.DATE_MED)
+})
+PlanSchema.virtual('virtual_num_to_word').get(function () {
+   shift_names = ['Poranna', 'Popołudniowa', 'Nocna']
+   return shift_names[this.shift - 1]
 })
 
 // Virtual for plan's URL

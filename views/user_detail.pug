@@ -2,4 +2,14 @@ extends layout
 
 block content
 
-   h1 Pracownik UR: #{user.fullname}
+   h1 Pracownik UR:  
+   h4 #{user.fullname}
+   p #[strong Email:] #{user.email}
+   p #[strong Specjalizacja:] #{user.spec}
+   p #[strong Przywileje:]  
+   ul
+      if user.isTech
+         li Technik
+      if user.isAdmin
+         li Admin
+   
