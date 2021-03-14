@@ -1,5 +1,7 @@
 const Devicetype = require('../models/devicetype')
+const Device = require('../models/device')
 
+const async = require('async')
 const { body, validationResult } = require('express-validator')
 // Display list of all devicetypes.
 exports.devicetype_list = function (req, res, next) {
@@ -16,7 +18,20 @@ exports.devicetype_list = function (req, res, next) {
 
 // Display detail page for a specific devicetype.
 exports.devicetype_detail = function (req, res) {
-   res.send('NOT IMPLEMENTED: devicetype detail: ' + req.params.id)
+   Devicetype.findById(req.params.id).exec(function (err, devicetype) {
+      if (err) {
+         return next(err)
+      }
+      if (devicetype == null) {
+         let err = new Error('Nie znaleziono takiej linii')
+         err.status(404)
+         return next(err)
+      }
+      res.render('devicetype_detail', {
+         title: 'Linia',
+         devicetype: devicetype,
+      })
+   })
 }
 
 // Display devicetype create form on GET.
@@ -67,21 +82,124 @@ exports.devicetype_create_post = [
 ]
 
 // Display devicetype delete form on GET.
-exports.devicetype_delete_get = function (req, res) {
-   res.send('NOT IMPLEMENTED: devicetype delete GET')
+exports.devicetype_delete_get = function (req, res, next) {
+   async.parallel(
+      {
+         devicetype: function (callback) {
+            Devicetype.findById(req.params.id).exec(callback)
+         },
+         devicetype_devices: function (callback) {
+            Device.find({ devicetype: req.params.id }).exec(callback)
+         },
+      },
+      function (err, results) {
+         if (err) {
+            return next(err)
+         }
+         if (results.devicetype == null) {
+            // No results.
+            res.redirect('/api/devicetype')
+         }
+         // Successful, so render.
+         res.render('devicetype_delete', {
+            title: 'Usuń linię',
+            devicetype: results.devicetype,
+            devicetype_devices: results.devicetype_devices,
+         })
+      }
+   )
 }
-
 // Handle devicetype delete on POST.
 exports.devicetype_delete_post = function (req, res) {
-   res.send('NOT IMPLEMENTED: devicetype delete POST')
+   async.parallel(
+      {
+         devicetype: function (callback) {
+            Devicetype.findById(req.body.devicetypeid).exec(callback)
+         },
+         devicetype_devices: function (callback) {
+            Device.find({ devicetype: req.body.devicetypeid }).exec(callback)
+         },
+      },
+      function (err, results) {
+         if (err) {
+            return next(err)
+         }
+         // Success
+         if (results.devicetype_devices.length > 0) {
+            // devicetype has devices. Render in same way as for GET route.
+            res.render('devicetype_delete', {
+               title: 'Usuń linię',
+               devicetype: results.devicetype,
+               devicetype_devices: results.devicetype_devices,
+            })
+            return
+         } else {
+            // Author has no books. Delete object and redirect to the list of authors.
+            Devicetype.findByIdAndRemove(
+               req.body.devicetypeid,
+               function deleteDevicetype(err) {
+                  if (err) {
+                     return next(err)
+                  }
+                  // Success - go to author list
+                  res.redirect('/api/devicetype')
+               }
+            )
+         }
+      }
+   )
 }
-
 // Display devicetype update form on GET.
 exports.devicetype_update_get = function (req, res) {
-   res.send('NOT IMPLEMENTED: devicetype update GET')
+   Devicetype.findById(req.params.id).exec(function (err, devicetype) {
+      if (err) {
+         return next(err)
+      }
+      if (devicetype == null) {
+         var err = new Error('Devicetype not found')
+         err.status = 404
+         return next(err)
+      }
+      // success
+      res.render('devicetype_form', {
+         title: 'Stwórz urządzenie',
+         devicetype: devicetype,
+      })
+   })
 }
 
 // Handle devicetype update on POST.
-exports.devicetype_update_post = function (req, res) {
-   res.send('NOT IMPLEMENTED: devicetype update POST')
-}
+exports.devicetype_update_post = [
+   body('name', 'Nazwa linii jest wymagana.')
+      .trim()
+      .isLength({ min: 1 })
+      .escape(),
+
+   (req, res, next) => {
+      const errors = validationResult(req)
+
+      let devicetype = new Devicetype({
+         name: req.body.name,
+         _id: req.params.id,
+      })
+
+      if (!errors.isEmpty()) {
+         res.render('devicetype_form', {
+            title: 'Stwórz linię',
+            devicetype: devicetype,
+         })
+      } else {
+         Devicetype.findByIdAndUpdate(
+            req.params.id,
+            devicetype,
+            {},
+            function (err, thedevicetype) {
+               if (err) {
+                  return next(err)
+               }
+               res.redirect(thedevicetype.url)
+            }
+         )
+      }
+   },
+]

@@ -1,0 +1,15 @@
+extends layout
+
+block content
+
+   h1 #{title}
+
+   p #[strong Nazwa:] #{devicetype.name}
+
+    hr
+    p 
+    a(href=devicetype.url + '/delete') Usuń typ urządzenia
+    p
+    a(href=devicetype.url+'/update') Zmodyfikuj typ urządzenia
+
+  

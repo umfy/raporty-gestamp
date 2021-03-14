@@ -163,6 +163,7 @@ router.post('/search', search_controller.search_page_post)
 
 /// USERS  ROUTES ///
 
+router.get('/user/team', user_controller.user_team)
 // GET request for creating new user
 router.get('/user/create', user_controller.user_create_get)
 

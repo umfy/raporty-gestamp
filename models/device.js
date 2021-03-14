@@ -11,7 +11,7 @@ const DeviceSchema = new Schema({
       ref: 'Devicetype',
       required: true,
    },
-   desc: { type: String, required: true },
+   desc: { type: String },
 })
 
 // Virtual for plan's URL

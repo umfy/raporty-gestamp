@@ -8,7 +8,7 @@ const DevicetypeSchema = new Schema({
 
 // Virtual for plan's URL
 DevicetypeSchema.virtual('url').get(function () {
-   return '/api/device/' + this._id
+   return '/api/devicetype/' + this._id
 })
 
 //Export model

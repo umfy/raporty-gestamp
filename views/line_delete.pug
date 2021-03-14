@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  h1 #{title}: #{line.name}
+
+  if line_devices.length
+
+    p #[strong Usuń poniższe urządzenia przed usunięciem linii:]
+
+    div(style='margin-left:20px;margin-top:20px')
+
+      h4 Urządzenia:
+
+      dl
+      each device in line_devices
+        dt
+          a(href=device.url) #{device.name}
+        dd #{device.desc}
+
+  else
+    p Do you really want to delete this line?
+
+    form(method='POST' action='')
+      div.form-group
+        input#lineid.form-control(type='hidden',name='lineid', required='true', value=line._id )
+
+      button.btn.btn-primary(type='submit') Delete

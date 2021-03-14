@@ -7,6 +7,7 @@ const UserSchema = new Schema({
    surname: { type: String, required: true, maxlength: 100 },
    email: { type: String, maxlength: 100 },
    spec: { type: String, maxlength: 100 },
+   shift: { type: Number },
    isTech: { type: Boolean },
    isAdmin: { type: Boolean },
 })

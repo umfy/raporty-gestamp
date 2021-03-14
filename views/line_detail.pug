@@ -1,0 +1,15 @@
+extends layout
+
+block content
+
+   h1 #{title}
+
+   p #[strong Nazwa:] #{line.name}
+
+    hr
+    p 
+    a(href=line.url + '/delete') Usuń linię
+    p
+    a(href=line.url+'/update') Zmodyfikuj linię
+
+  

@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  h1 #{title}: #{user.fullname}
+
+  if user_plans.length
+
+    p #[strong Usuń poniższe plany przed usunięciem użytkownika:]
+
+    div(style='margin-left:20px;margin-top:20px')
+
+      h4 Plany:
+
+      dl
+      each plan in user_plans
+        dt
+          a(href=plan.url) #{plan.date_created}
+        dd #{plan.desc}
+
+  else
+    p Do you really want to delete this user?
+
+    form(method='POST' action='')
+      div.form-group
+        input#userid.form-control(type='hidden',name='userid', required='true', value=user._id )
+
+      button.btn.btn-primary(type='submit') Delete

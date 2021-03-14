@@ -1,0 +1,38 @@
+extends layout
+
+block content
+  h1= title
+
+  form(method='POST' action='')
+    div.form-group
+      label(for='name') Nazwa:
+      input#name.form-control(type='text', placeholder='Nazwa urządzenia' name='name' value=(undefined===device ? '' : device.name) )
+      label(for='ip') IP:
+      input#ip.form-control(type='text', placeholder='172.168.0.1' name='ip' value=(undefined===device ? '' : device.ip) )
+    div.form-group
+      label(for='line') Lina:
+      select#line.form-control(type='select', placeholder='Linia' name='line' )
+        - lines.sort(function(a, b) {let textA = a.name.toUpperCase(); let textB = b.name.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+        for line in lines
+          if device
+            option(value=line._id selected=(line._id.toString()===device.line._id.toString() ? 'selected' : false) ) #{line.name}
+          else
+            option(value=line._id) #{line.name}
+    div.form-group
+      label(for='devicetype') Typ urządzenia:
+      select#devicetype.form-control(type='select', placeholder='Typ urządzenia' name='devicetype' )
+        - devicetypes.sort(function(a, b) {let textA = a.name.toUpperCase(); let textB = b.name.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+        for devicetype in devicetypes
+          if device
+            option(value=devicetype._id selected=(devicetype._id.toString()===device.devicetype._id.toString() ? 'selected' : false) ) #{devicetype.name}
+          else
+            option(value=devicetype._id) #{devicetype.name}
+    div.form-group
+      label(for='desc') Opis:
+      textarea#desc.form-control(type='textarea', placeholder='Opis' name='desc') #{undefined===book ? '' : book.desc}
+    button.btn.btn-primary(type='submit') Submit
+
+  if errors
+    ul
+      for error in errors
+        li!= error.msg

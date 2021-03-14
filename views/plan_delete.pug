@@ -1,0 +1,14 @@
+extends layout
+
+block content
+   h1 #{title}: #{plan.date_created}
+
+   h4 #{plan.desc}
+
+   p Do you really want to delete this plan?
+
+   form(method='POST' action='')
+      div.form-group
+         input#planid.form-control(type='hidden',name='planid', required='true', value=plan._id )
+
+      button.btn.btn-primary(type='submit') Delete

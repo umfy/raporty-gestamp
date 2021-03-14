@@ -1,0 +1,65 @@
+extends layout
+
+block content
+
+   .subject-info-box-1
+   select#lstBox1.form-control(multiple='multiple')
+      option(value='ajax') Ajax
+      option(value='jquery') jQuery
+      option(value='javascript') JavaScript
+      option(value='mootool') MooTools
+      option(value='prototype') Prototype
+      option(value='dojo') Dojo
+   .subject-info-arrows.text-center
+      input#btnAllRight.btn.btn-default(type='button' value='>>' disabled='')
+      br
+      input#btnRight.btn.btn-default(type='button' value='>')
+      br
+      input#btnLeft.btn.btn-default(type='button' value='<')
+      br
+      input#btnAllLeft.btn.btn-default(type='button' value='<<' disabled='')
+   .subject-info-box-2
+   select#lstBox2.form-control(multiple='multiple')
+      option(value='asp') ASP.NET
+      option(value='c#') C#
+      option(value='vb') VB.NET
+      option(value='java') Java
+      option(value='php') PHP
+      option(value='python') Python
+   .clearfix
+   script.
+      document.getElementById('btnRight').addEventListener('click', function(e) {
+         var options = document.getElementById('lstBox1').options;
+         var selectedOpts = [];
+         for(var i=0; i < options.length; i++) {
+         if (options[i].selected) {
+         selectedOpts.push(options[i]);
+         }
+         }
+         if (selectedOpts.length == 0) {
+         alert("Nothing to move.");
+         e.preventDefault();
+         }
+         var lstBox2 = document.getElementById('lstBox2');   
+         selectedOpts.forEach(function(opt) {
+         lstBox2.appendChild(opt);
+         });
+         })
+   script.
+      document.getElementById('btnLeft').addEventListener('click', function(e) {
+         var options = document.getElementById('lstBox2').options;
+         var selectedOpts = [];
+         for(var i=0; i < options.length; i++) {
+         if (options[i].selected) {
+         selectedOpts.push(options[i]);
+         }
+         }
+         if (selectedOpts.length == 0) {
+         alert("Nothing to move.");
+         e.preventDefault();
+         }
+         var lstBox2 = document.getElementById('lstBox1');   
+         selectedOpts.forEach(function(opt) {
+         lstBox2.appendChild(opt);
+         });
+         })

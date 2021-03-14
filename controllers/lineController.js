@@ -1,4 +1,5 @@
 const Line = require('../models/line')
+const Device = require('../models/device')
 const async = require('async')
 
 const { body, validationResult } = require('express-validator')
@@ -19,7 +20,17 @@ exports.line_list = function (req, res, next) {
 // Display detail page for a specific line.
 // (low prioriy implementation)
 exports.line_detail = function (req, res) {
-   res.send('NOT IMPLEMENTED: line detail: ' + req.params.id)
+   Line.findById(req.params.id).exec(function (err, line) {
+      if (err) {
+         return next(err)
+      }
+      if (line == null) {
+         let err = new Error('Nie znaleziono takiej linii')
+         err.status(404)
+         return next(err)
+      }
+      res.render('line_detail', { title: 'Linia', line: line })
+   })
 }
 
 // Display line create form on GET.
@@ -48,7 +59,7 @@ exports.line_create_post = [
       // extract the validation errors from a request
       const errors = validationResult(req)
 
-      var line = new Line({ name: req.body.name })
+      let line = new Line({ name: req.body.name })
 
       if (!errors.isEmpty()) {
          // if there are errors, render the form
@@ -72,20 +83,117 @@ exports.line_create_post = [
 
 // Display line delete form on GET.
 exports.line_delete_get = function (req, res, next) {
-   res.send('NOT IMPLEMENTED: line delete GET')
+   async.parallel(
+      {
+         line: function (callback) {
+            Line.findById(req.params.id).exec(callback)
+         },
+         line_devices: function (callback) {
+            Device.find({ line: req.params.id }).exec(callback)
+         },
+      },
+      function (err, results) {
+         if (err) {
+            return next(err)
+         }
+         if (results.line == null) {
+            // No results.
+            res.redirect('/api/line')
+         }
+         // Successful, so render.
+         res.render('line_delete', {
+            title: 'Usuń linię',
+            line: results.line,
+            line_devices: results.line_devices,
+         })
+      }
+   )
 }
-
 // Handle line delete on POST.
 exports.line_delete_post = function (req, res) {
-   res.send('NOT IMPLEMENTED: line delete POST')
+   async.parallel(
+      {
+         line: function (callback) {
+            Line.findById(req.body.lineid).exec(callback)
+         },
+         line_devices: function (callback) {
+            Device.find({ line: req.body.lineid }).exec(callback)
+         },
+      },
+      function (err, results) {
+         if (err) {
+            return next(err)
+         }
+         // Success
+         if (results.line_devices.length > 0) {
+            // line has devices. Render in same way as for GET route.
+            res.render('line_delete', {
+               title: 'Usuń linię',
+               line: results.line,
+               line_devices: results.line_devices,
+            })
+            return
+         } else {
+            // Author has no books. Delete object and redirect to the list of authors.
+            Line.findByIdAndRemove(req.body.lineid, function deleteLine(err) {
+               if (err) {
+                  return next(err)
+               }
+               // Success - go to author list
+               res.redirect('/api/line')
+            })
+         }
+      }
+   )
 }
-
 // Display line update form on GET.
 exports.line_update_get = function (req, res) {
-   res.send('NOT IMPLEMENTED: line update GET')
+   Line.findById(req.params.id).exec(function (err, line) {
+      if (err) {
+         return next(err)
+      }
+      if (line == null) {
+         var err = new Error('Line not found')
+         err.status = 404
+         return next(err)
+      }
+      // success
+      res.render('line_form', {
+         title: 'Edytuj linię',
+         line: line,
+      })
+   })
 }
 
 // Handle line update on POST.
-exports.line_update_post = function (req, res) {
-   res.send('NOT IMPLEMENTED: line update POST')
-}
+exports.line_update_post = [
+   body('name', 'Nazwa linii jest wymagana.')
+      .trim()
+      .isLength({ min: 1 })
+      .escape(),
+
+   (req, res, next) => {
+      const errors = validationResult(req)
+
+      let line = new Line({ name: req.body.name, _id: req.params.id })
+
+      if (!errors.isEmpty()) {
+         res.render('line_form', {
+            title: 'Edytuj linię',
+            line: line,
+         })
+      } else {
+         Line.findByIdAndUpdate(
+            req.params.id,
+            line,
+            {},
+            function (err, theline) {
+               if (err) {
+                  return next(err)
+               }
+               res.redirect(theline.url)
+            }
+         )
+      }
+   },
+]

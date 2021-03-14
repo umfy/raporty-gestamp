@@ -1,8 +1,19 @@
 const User = require('../models/user')
+const Plan = require('../models/plan')
 
 const async = require('async')
 
 const { body, validationResult } = require('express-validator')
+
+exports.user_team = function (req, res, next) {
+   User.find().exec(function (err, list_users) {
+      if (err) {
+         return nexr(err)
+      }
+      res.render('user_team.pug')
+   })
+}
+
 // Display list of all userss.
 exports.user_list = function (req, res, next) {
    User.find()
@@ -47,19 +58,13 @@ exports.user_create_post = [
       .isLength({ min: 1 })
       .escape()
       .withMessage('Imię jest wymagane')
-      .bail()
-      .isAlphanumeric()
-      .withMessage('Imię nie może zawierać znaków innych niż alfanumeryczne'),
+      .bail(),
    body('surname')
       .trim()
       .isLength({ min: 1 })
       .escape()
       .withMessage('Nazwisko jest wymagane')
-      .bail()
-      .isAlphanumeric()
-      .withMessage(
-         'Nazwisko nie może zawierać znaków innych niż alfanumeryczne'
-      ),
+      .bail(),
    body('email', 'Adres email jest nieprawidłowy')
       .optional({ checkFalsy: true })
       .isEmail()
@@ -90,6 +95,7 @@ exports.user_create_post = [
             surname: req.body.surname,
             email: req.body.email,
             spec: req.body.spec,
+            shift: 0,
             isTech: req.body.isTech,
             isAdmin: req.body.isAdmin,
          })
@@ -105,21 +111,144 @@ exports.user_create_post = [
 ]
 
 // Display users delete form on GET.
-exports.user_delete_get = function (req, res) {
-   res.send('NOT IMPLEMENTED: users delete GET')
+exports.user_delete_get = function (req, res, next) {
+   async.parallel(
+      {
+         user: function (callback) {
+            User.findById(req.params.id).exec(callback)
+         },
+         user_plans: function (callback) {
+            Plan.find({ user: req.params.id }).exec(callback)
+            // user_raports !
+         },
+      },
+      function (err, results) {
+         if (err) {
+            return next(err)
+         }
+         if (results.user == null) {
+            // No results.
+            res.redirect('/api/user')
+         }
+         // Successful, so render.
+         res.render('user_delete', {
+            title: 'Usuń użytkownika',
+            user: results.user,
+            user_plans: results.user_plans,
+         })
+      }
+   )
 }
-
-// Handle users delete on POST.
+// Handle user delete on POST.
 exports.user_delete_post = function (req, res) {
-   res.send('NOT IMPLEMENTED: users delete POST')
+   async.parallel(
+      {
+         user: function (callback) {
+            User.findById(req.body.userid).exec(callback)
+         },
+         user_plans: function (callback) {
+            Plan.find({ user: req.body.userid }).exec(callback)
+         },
+      },
+      function (err, results) {
+         if (err) {
+            return next(err)
+         }
+         // Success
+         if (results.user_plans.length > 0) {
+            // user has devices. Render in same way as for GET route.
+            res.render('user_delete', {
+               title: 'Usuń użytkownika',
+               user: results.user,
+               user_plans: results.user_plans,
+            })
+            return
+         } else {
+            // Author has no books. Delete object and redirect to the list of authors.
+            User.findByIdAndRemove(req.body.userid, function deleteUser(err) {
+               if (err) {
+                  return next(err)
+               }
+               // Success - go to author list
+               res.redirect('/api/user')
+            })
+         }
+      }
+   )
 }
 
-// Display users update form on GET.
+// Display user update form on GET.
 exports.user_update_get = function (req, res) {
-   res.send('NOT IMPLEMENTED: users update GET')
+   User.findById(req.params.id).exec(function (err, user) {
+      if (err) {
+         return next(err)
+      }
+      if (user == null) {
+         var err = new Error('User not found')
+         err.status = 404
+         return next(err)
+      }
+      // success
+      res.render('user_form', {
+         title: 'Edytuj użytkownika',
+         user: user,
+      })
+   })
 }
 
-// Handle users update on POST.
-exports.user_update_post = function (req, res) {
-   res.send('NOT IMPLEMENTED: users update POST')
-}
+// Handle user update on POST.
+exports.user_update_post = [
+   body('name')
+      .trim()
+      .isLength({ min: 1 })
+      .escape()
+      .withMessage('Imię jest wymagane')
+      .bail(),
+   body('surname')
+      .trim()
+      .isLength({ min: 1 })
+      .escape()
+      .withMessage('Nazwisko jest wymagane')
+      .bail(),
+   body('email', 'Adres email jest nieprawidłowy')
+      .optional({ checkFalsy: true })
+      .isEmail()
+      .normalizeEmail(),
+   body('spec').escape(),
+   body('isTech').toBoolean(),
+   body('isAdmin').toBoolean(),
+
+   (req, res, next) => {
+      const errors = validationResult(req)
+
+      let user = new User({
+         name: req.body.name,
+         surname: req.body.surname,
+         email: req.body.email,
+         spec: req.body.spec,
+         shift: 0,
+         isTech: req.body.isTech,
+         isAdmin: req.body.isAdmin,
+         _id: req.params.id,
+      })
+
+      if (!errors.isEmpty()) {
+         res.render('user_form', {
+            title: 'Edytuj użytkownika',
+            user: user,
+         })
+      } else {
+         User.findByIdAndUpdate(
+            req.params.id,
+            user,
+            {},
+            function (err, theuser) {
+               if (err) {
+                  return next(err)
+               }
+               res.redirect(theuser.url)
+            }
+         )
+      }
+   },
+]
