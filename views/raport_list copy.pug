@@ -15,45 +15,44 @@ head
 body
   header
     nav(class="navbar navbar-dark bg-gestampblue navbar-expand-lg")
-      a(href="/api/raport" class="navbar-brand")
+      a(href="#" class="navbar-brand")
         img(src="https://www.gestamp.com/Gestamp11/media/GestampFiles/Logo-Gestamp-(white)02.svg" height="30" class="d-inline-block align-bottom mr-4" alt="Gestamp ಠ_ಠ")
       button(class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu")
         span(class="navbar-toggler-icon")
       div(class="collapse navbar-collapse" id="mainmenu")
         ul(class="navbar-nav")
           li(class="nav-item")
-            a(class="nav-link" href="/api/raport/create") Raport
+            a(class="nav-link" href="#") Raport
           li(class="nav-item")
-            a(class="nav-link" href="/api/plan") Prace Planowane
+            a(class="nav-link" href="#") Prace Planowane
           li(class="nav-item dropdown")
             a(class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" id="device-dropdown") Menedżer urządzeń
             div(class="dropdown-menu")
-              a(class="dropdown-item" href="/api/line") Linie Produkcyjne
-              a(class="dropdown-item" href="/api/devicetype") Typy Urządzeń
-              a(class="dropdown-item" href="/api/device") Urządzenia
+              a(class="dropdown-item" href="#") Linie Produkcyjne
+              a(class="dropdown-item" href="#") Typy Urządzeń
+              a(class="dropdown-item" href="#") Urządzenia
           li(class="nav-item dropdown")
             a(class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" id="search-dropdown") Zarządzanie zespołem
             div(class="dropdown-menu")
-              a(class="dropdown-item" href="/api/user") Pracownicy
-              a(class="dropdown-item" href="/api/team") Skład Zmiany
+              a(class="dropdown-item" href="#") Pracownicy
+              a(class="dropdown-item" href="#") Skład Zmiany
           li(class="nav-item dropdown")
             a(class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" id="search-dropdown") Wyszukiwanie
             div(class="dropdown-menu")
-              a(class="dropdown-item" href="search/raport") Raporty
-              a(class="dropdown-item" href="/search/breakdown") Awarie
+              a(class="dropdown-item" href="#") Raporty
+              a(class="dropdown-item" href="#") Awarie
 
-    // wrapper
     div(class='container-fluid')
       div(class='row')
         // navbar
-        aside(class='col-sm-2 my-3 umfy-vertical-navbar' id="umfy-borderless-card")
-          ul(class='nav flex-column')
+        aside(class='col-sm-2 my-3')
+          ul(class='nav flex-column bg-gestampblue')
             div(class="card bg-gestampblue") 
-              div(class="card-body")
-                a(class="btn btn-link text-left btn-block text-light" type="button" href="/api/raport/create") Raport
+              div(class="card-header")
+                button(class="btn btn-link text-left btn-block text-light" type="button" href="#") Raport
             div(class="card bg-gestampblue")
-              div(class="card-body")
-                a(class="btn btn-link text-left btn-block text-light" type="button" href="/api/plan") Prace planowane
+              div(class="card-header")
+                button(class="btn btn-link text-left btn-block text-light" type="button" href="#") Prace planowane
 
             div(class="accordion" id="accordionExample")   
               div(class="card bg-gestampblue")
@@ -63,9 +62,9 @@ body
                       Collapsible Menedżer urządzeń
                 div(id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample")
                   div(class="card-body bg-light")
-                    a(class="dropdown-item" href="/api/line") Linie produkcyjne
-                    a(class="dropdown-item" href="/api/devicetype") Typy Urządzeń
-                    a(class="dropdown-item" href="/api/device") Urządzenia
+                    a(class="dropdown-item" href="#") Linie produkcyjne
+                    a(class="dropdown-item" href="#") Typy Urządzeń
+                    a(class="dropdown-item" href="#") Urządzenia
 
 
               div(class="card bg-gestampblue")
@@ -75,8 +74,8 @@ body
                       Collapsible Zarządzanie zespołem
                 div(id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample")
                   div(class="card-body bg-light")
-                    a(class="dropdown-item" href="/api/user") Pracownicy
-                    a(class="dropdown-item" href="/api/team") Skład Zmiany
+                    a(class="dropdown-item" href="#") Pracownicy
+                    a(class="dropdown-item" href="#") Skład Zmiany
                 
               div(class="card bg-gestampblue")
                 div(class="card-header" id="headingThree")
@@ -85,8 +84,16 @@ body
                       Collapsible Wyszukiwanie
                 div(id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample")
                   div(class="card-body bg-light")
-                    a(class="dropdown-item" href="/api/search/raport") Raporty
-                    a(class="dropdown-item" href="/api/search/breakdown") Awarie
+                    a(class="dropdown-item" href="#") Raporty
+                    a(class="dropdown-item" href="#") Awarie
      
         // main display
-        block content
+        article(class="my-4")
+          h1=title
+
+          ul 
+              each raport in raport_list
+                li
+                    a(href=raport.url) #{raport.date}
+              else
+                li There are no raports.

@@ -1,11 +1,12 @@
 extends layout
 
 block content
-   h1= title
+   div(class="col-sm-7 my-5")
+      h1= title
 
-   ul 
-      each user in user_list
-         li
-            a(href=user.url) #{user.name}
-      else
-         li There are no users.
+      ul 
+         each user in user_list
+            li
+               a(href=user.url) #{user.name}
+         else
+            li There are no users.

@@ -1,25 +1,25 @@
 extends layout
 
 block content
+   div(class="col-sm-7 my-5")
+      h1 #{title}
+      p #[strong Status: ]
+        if plan.isDone
+          span.text-success  Zakończone
+        else
+          span.text-danger  Oczekujące
 
-   h1 #{title}
-   p #[strong Status: ]
-    if plan.isDone
-      span.text-success  Zakończone
-    else
-      span.text-danger  Oczekujące
-
-   p #[strong Utworzone:] #{plan.date_created}
-   p #[strong Opis:] #{plan.desc}
-   p #[strong Zaplanował:] #{plan.user.fullname}
-   p #[strong Data realizacji:] #{plan.date_execution}
-   p #[strong Zmiana realizująca plan:] #{plan.shift}
+      p #[strong Utworzone:] #{plan.date_created}
+      p #[strong Opis:] #{plan.desc}
+      p #[strong Zaplanował:] #{plan.user.fullname}
+      p #[strong Data realizacji:] #{plan.date_execution}
+      p #[strong Zmiana realizująca plan:] #{plan.shift}
 
 
-    hr
-    p 
-    a(href=plan.url + '/delete') Usuń Plan
-    p
-    a(href=plan.url+'/update') Zmodyfikuj Plan
+
+   div(class="col-lg-2 my-5")
+        a(href=plan.url + '/delete') Usuń 
+        p
+        a(href=plan.url+'/update') Zmodyfikuj 
 
   

@@ -1,20 +1,19 @@
 extends layout
 
 block content
-
-   h1 Pracownik UR:  
-   h4 #{user.fullname}
-   p #[strong Email:] #{user.email}
-   p #[strong Specjalizacja:] #{user.spec}
-   p #[strong Przywileje:]  
-   ul
-      if user.isTech
-         li Technik
-      if user.isAdmin
-         li Admin
-   
-   hr
-   p 
-   a(href=user.url + '/delete') Usuń użytkownika
-   p
-   a(href=user.url+'/update') Zmodyfikuj użytkownika
+   div(class="col-sm-7 my-5")
+      h1 Pracownik UR:  
+      h4 #{user.fullname}
+      p #[strong Email:] #{user.email}
+      p #[strong Specjalizacja:] #{user.spec}
+      p #[strong Przywileje:]  
+      ul
+         if user.isTech
+            li Technik
+         if user.isAdmin
+            li Admin
+      
+   div(class="col-lg-2 my-5")
+        a(href=user.url + '/delete') Usuń 
+        p
+        a(href=user.url + '/update') Zmodyfikuj 

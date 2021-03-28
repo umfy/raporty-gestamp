@@ -45,26 +45,26 @@ router.post('/devicetype/create', devicetype_controller.devicetype_create_post)
 
 // GET request to delete devicetype
 router.get(
-   '/devicetype/:id/delete',
-   devicetype_controller.devicetype_delete_get
+  '/devicetype/:id/delete',
+  devicetype_controller.devicetype_delete_get
 )
 
 // POST request to delete devicetype
 router.post(
-   '/devicetype/:id/delete',
-   devicetype_controller.devicetype_delete_post
+  '/devicetype/:id/delete',
+  devicetype_controller.devicetype_delete_post
 )
 
 // GET request to update devicetype
 router.get(
-   '/devicetype/:id/update',
-   devicetype_controller.devicetype_update_get
+  '/devicetype/:id/update',
+  devicetype_controller.devicetype_update_get
 )
 
 // POST request to update devicetype
 router.post(
-   '/devicetype/:id/update',
-   devicetype_controller.devicetype_update_post
+  '/devicetype/:id/update',
+  devicetype_controller.devicetype_update_post
 )
 
 // GET request for list of all device items
@@ -156,10 +156,16 @@ router.get('/raport/:id', raport_controller.raport_detail)
 /// SEARCH ROUTES ///
 
 // GET request for search page
-router.get('/search', search_controller.search_page_get)
+router.get('/search/raport', search_controller.search_raport_get)
 
 // POST route to search for specific items
-router.post('/search', search_controller.search_page_post)
+router.post('/search/raport', search_controller.search_raport_post)
+
+// GET request for search page
+router.get('/search/breakdown', search_controller.search_breakdown_get)
+
+// POST route to search for specific items
+router.post('/search/breakdown', search_controller.search_breakdown_post)
 
 /// USERS  ROUTES ///
 

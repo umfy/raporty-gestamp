@@ -1,15 +1,15 @@
 extends layout
 
 block content
+   div(class="col-sm-7 my-5")
+      h1 #{title}
 
-   h1 #{title}
+      p.h4.pt-3 Nazwa: #{line.name}
 
-   p #[strong Nazwa:] #{line.name}
+   div(class="col-lg-2 my-5")
+        a(href=line.url + '/delete') Usuń 
+        p
+        a(href=line.url+'/update') Zmodyfikuj 
 
-    hr
-    p 
-    a(href=line.url + '/delete') Usuń linię
-    p
-    a(href=line.url+'/update') Zmodyfikuj linię
-
+  
   

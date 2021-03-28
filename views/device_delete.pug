@@ -1,27 +1,28 @@
 extends layout
 
 block content
-  h1 #{title}: #{device.name}
+  div(class="col-sm-7 my-5")
+    h1 #{title}: #{device.name}
 
-  if device_plans.length
+    if device_plans.length
 
-    p #[strong Usuń poniższe plany przed usunięciem urządzenia:]
+      p.h4.pt-3 Usuń poniższe plany przed usunięciem urządzenia:
 
-    div(style='margin-left:20px;margin-top:20px')
+      div(style='margin-left:20px;margin-top:20px')
 
-      h4 Plany:
+        h4 Plany:
 
-      dl
-      each plan in device_plans
-        dt
-          a(href=plan.url) #{plan.date_created}
-        dd #{plan.desc}
+        dl
+        each plan in device_plans
+          dt
+            a(href=plan.url) #{plan.date_created}
+          dd #{plan.desc}
 
-  else
-    p Do you really want to delete this plan?
+    else
+      p Czy na pewno chcesz usunąć to Urządzenie?
 
-    form(method='POST' action='')
-      div.form-group
-        input#deviceid.form-control(type='hidden',name='deviceid', required='true', value=device._id )
+      form(method='POST' action='')
+        div.form-group
+          input#deviceid.form-control(type='hidden',name='deviceid', required='true', value=device._id )
 
-      button.btn.btn-primary(type='submit') Delete
+        button.btn.btn-danger(type='submit') Delete

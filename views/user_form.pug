@@ -1,31 +1,31 @@
 extends layout
 
 block content
+   div(class="col-sm-7 my-5")
+      h1 #{title}
 
-   h1 #{title}
+      form(method='POST' action='')
+         div.form-group
+            label(for='name') Imię:
+            input#name.form-control(type='text', placehoder='Sam' name='name', value=(undefined===user ? '' : user.name))
+            label(for='surname') Nazwisko:
+            input#name.form-control(type='text', placehoder='Sepiol' name='surname', value=(undefined===user ? '' : user.surname))
+            label(for='email') Email:
+            input#name.form-control(type='text', placehoder='samsepiol@mail.com' name='email', value=(undefined===user ? '' : user.email))
+            label(for='spec') Specjalność:
+            input#name.form-control(type='text', placehoder='Robotyk' name='spec', value=(undefined===user ? '' : user.spec))
 
-   form(method='POST' action='')
-      div.form-group
-         label(for='name') Imię:
-         input#name.form-control(type='text', placehoder='Sam' name='name', value=(undefined===user ? '' : user.name))
-         label(for='surname') Nazwisko:
-         input#name.form-control(type='text', placehoder='Sepiol' name='surname', value=(undefined===user ? '' : user.surname))
-         label(for='email') Email:
-         input#name.form-control(type='text', placehoder='samsepiol@mail.com' name='email', value=(undefined===user ? '' : user.email))
-         label(for='spec') Specjalność:
-         input#name.form-control(type='text', placehoder='Robotyk' name='spec', value=(undefined===user ? '' : user.spec))
+            label Przywileje:
+            div
+            div(style='display: inline; padding-right:10px;')
+               input.checkbox-input(type='checkbox', id='isTech', name='isTech', value=1, checked=false)
+               label(for='isTech') Technik
+            div(style='display: inline; padding-right:10px;')
+               input.checkbox-input(type='checkbox', id='isAdmin', name='isAdmin', value=1, checked=false)
+               label(for='isAdmin') Administrator
+         button.btn.btn-primary(type='submit') Zapisz
 
-         label Przywileje:
-         div
-         div(style='display: inline; padding-right:10px;')
-            input.checkbox-input(type='checkbox', id='isTech', name='isTech', value=1, checked=false)
-            label(for='isTech') Technik
-         div(style='display: inline; padding-right:10px;')
-            input.checkbox-input(type='checkbox', id='isAdmin', name='isAdmin', value=1, checked=false)
-            label(for='isAdmin') Administrator
-      button.btn.btn-primary(type='submit') Submit
-
-   if errors
-      ul
-         for error in errors
-            li!=error.msg
+      if errors
+         ul
+            for error in errors
+               li!=error.msg

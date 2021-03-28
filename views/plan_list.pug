@@ -1,12 +1,15 @@
 extends layout
 
 block content
-   h1= title
+   div(class="col-md-7 my-5 text-body")
+      h1= title
 
-   ul 
-      each plan in plan_list
-         li
-            a(href=plan.url) #{plan.date_created}
-            p #{plan.desc}
-      else
-         li There are no lines.
+      ul 
+         each plan in plan_list
+            li
+               a(href=plan.url) #{plan.date_created}
+               p #{plan.desc}
+         else
+            li There are no lines.
+   div(class="col-lg-2 py-5")
+      a(href="/api/plan/create") Utwórz nową pracę planowaną

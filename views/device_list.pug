@@ -1,11 +1,14 @@
 extends layout
 
 block content
-   h1= title
+   div(class="col-sm-7 my-5")
+      h1= title
 
-   ul 
-      each device in device_list
-         li
-            a(href=device.url) #{device.name}
-      else
-         li There are no decives.
+      ul 
+         each device in device_list
+            li
+               a(href=device.url) #{device.name}
+         else
+            li There are no decives.
+   div(class="col-lg-2 my-5")
+      a(href="/api/device/create") Utwórz Urządzenie

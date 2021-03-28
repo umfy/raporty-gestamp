@@ -1,11 +1,15 @@
 extends layout
 
 block content
-   h1= title
+   div(class="col-sm-7 my-5")
+      h1= title
 
-   ul 
-      each line in line_list
-         li
-            a(href=line.url) #{line.name}
-      else
-         li There are no lines.
+      ul 
+         each line in line_list
+            li
+               a(href=line.url) #{line.name}
+         else
+            li Brak linii.
+
+   div(class="col-lg-2 my-5")
+      a(href="/api/line/create") Utwórz Linię
