@@ -5,13 +5,36 @@ const async = require('async')
 
 const { body, validationResult } = require('express-validator')
 
-exports.user_team = function (req, res, next) {
-  User.find().exec(function (err, list_users) {
-    if (err) {
-      return nexr(err)
-    }
-    res.render('user_team.pug')
-  })
+exports.user_team_get = function (req, res, next) {
+  User.find()
+    .sort([['spec', 'ascending']])
+    .exec(function (err, list_users) {
+      if (err) {
+        return next(err)
+      }
+      res.render('user_team', {
+        title: 'Skład zmany',
+        user_list: list_users,
+      })
+    })
+}
+
+exports.user_team_post = function (req, res, next) {
+  const transferedUsers = JSON.parse(req.body.transfered)
+  for (i = 0; i < transferedUsers.length; i++) {
+    User.findByIdAndUpdate(
+      transferedUsers[i][0],
+      { shift: transferedUsers[i][1] },
+      {},
+      function (err, theuser) {
+        if (err) {
+          return next(err)
+        }
+      }
+    )
+  }
+
+  res.redirect('/api/user/team')
 }
 
 // Display list of all userss.
@@ -23,7 +46,7 @@ exports.user_list = function (req, res, next) {
         return next(err)
       }
       res.render('user_list', {
-        title: 'Lista Pracaowników',
+        title: 'Lista Pracowników',
         user_list: list_users,
       })
     })

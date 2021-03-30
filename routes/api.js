@@ -169,8 +169,11 @@ router.post('/search/breakdown', search_controller.search_breakdown_post)
 
 /// USERS  ROUTES ///
 
-router.get('/user/team', user_controller.user_team)
+router.get('/user/team', user_controller.user_team_get)
 // GET request for creating new user
+router.post('/user/team', user_controller.user_team_post)
+// GET request for creating new user
+
 router.get('/user/create', user_controller.user_create_get)
 
 // POST request for creating new user

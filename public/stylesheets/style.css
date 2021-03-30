@@ -17,3 +17,14 @@ body {
 #umfy-borderless-card .card {
   border-radius: 0;
 }
+.table caption {
+  caption-side: top;
+  text-align: center;
+}
+
+.table td {
+  padding: 0.2rem;
+}
+.table th {
+  padding: 0.2rem;
+}

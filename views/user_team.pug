@@ -1,5 +1,270 @@
-extends layout
+doctype html
+html(lang='en')
+head
+  title= title
+  meta(charset='utf-8')
+  meta(name='viewport', content='width=device-width, initial-scale=1')
+  link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css", integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z", crossorigin="anonymous")
+  link(rel='stylesheet', href='/stylesheets/style.css')
+  link(href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;subset=latin-ext" rel="stylesheet")
 
-block content
+  script(src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous")
+    // Always remember to call the above files first before calling the bootstrap.min.js file
+  script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous")
 
-   h1 Work in Progress
+  script.
+    // explicit variables' declaration
+    var transferedUsers = [];
+    var shift_picked = 0;
+
+  script.
+    function del(this_cell){
+
+      if (shift_picked == 0){
+        $('#zeroTable tr:last').after('<tr>' + $(this_cell).parents("tr").html() + '</tr>')
+      }
+      if (shift_picked == 1){
+        $('#oneTable tr:last').after('<tr>' + $(this_cell).parents("tr").html() + '</tr>')
+      }
+      if (shift_picked == 2){
+        $('#twoTable tr:last').after('<tr>' + $(this_cell).parents("tr").html() + '</tr>')
+      }
+      if (shift_picked == 3){
+        $('#threeTable tr:last').after('<tr>' + $(this_cell).parents("tr").html() + '</tr>')
+      }
+      // prepare the "transfered Users" list to export
+      if (transferedUsers.length == 0 ){
+        transferedUsers.push([this_cell.value, shift_picked]);
+      }
+      else {
+        for (i= 0; i<transferedUsers.length; i++){
+          var found = false;
+          if (transferedUsers[i][0] === this_cell.value){
+              transferedUsers[i][1] = shift_picked;
+              found = true;
+              break;
+          }
+        }
+        if (!found){
+          transferedUsers.push([this_cell.value, shift_picked]);
+        }
+      }
+      $(this_cell).parents("tr").remove();
+    }
+  script.
+    function activate(picked){
+      shift_picked = picked;
+      if (picked === 0) {
+        document.getElementById('zeroButton').style.color = 'green'
+        document.getElementById('oneButton').style.color = 'black'
+        document.getElementById('twoButton').style.color = 'black'
+        document.getElementById('threeButton').style.color = 'black'
+      }
+      if (picked === 1) {
+        document.getElementById('zeroButton').style.color = 'white'
+        document.getElementById('oneButton').style.color = 'green'
+        document.getElementById('twoButton').style.color = 'black'
+        document.getElementById('threeButton').style.color = 'black'
+      }
+      if (picked === 2)  {
+        document.getElementById('zeroButton').style.color = 'white'
+        document.getElementById('oneButton').style.color = 'black'
+        document.getElementById('twoButton').style.color = 'green'
+        document.getElementById('threeButton').style.color = 'black'
+      }
+      if (picked === 3) {
+        document.getElementById('zeroButton').style.color = 'white'
+        document.getElementById('oneButton').style.color = 'black'
+        document.getElementById('twoButton').style.color = 'black'
+        document.getElementById('threeButton').style.color = 'green'
+      }
+
+    }
+  script.
+    $(function(){
+      $('form').submit(function(){
+          document.getElementById('transfered').value = JSON.stringify(transferedUsers)
+          //alert('This happened before submit. Clicking OK will proceed.');
+      });
+    });
+  script.
+    function moveup(){
+      console.log('not implemented... yet')
+    }
+  
+body
+  header
+    nav(class="navbar navbar-dark bg-gestampblue navbar-expand-lg")
+      a(href="/api/raport" class="navbar-brand")
+        img(src="https://www.gestamp.com/Gestamp11/media/GestampFiles/Logo-Gestamp-(white)02.svg" height="30" class="d-inline-block align-bottom mr-4" alt="Gestamp ಠ_ಠ")
+      button(class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu")
+        span(class="navbar-toggler-icon")
+      div(class="collapse navbar-collapse" id="mainmenu")
+        ul(class="navbar-nav")
+          li(class="nav-item")
+            a(class="nav-link" href="/api/raport/create") Raport
+          li(class="nav-item")
+            a(class="nav-link" href="/api/plan") Prace Planowane
+          li(class="nav-item dropdown")
+            a(class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" id="device-dropdown") Menedżer urządzeń
+            div(class="dropdown-menu")
+              a(class="dropdown-item" href="/api/line") Linie Produkcyjne
+              a(class="dropdown-item" href="/api/devicetype") Typy Urządzeń
+              a(class="dropdown-item" href="/api/device") Urządzenia
+          li(class="nav-item dropdown")
+            a(class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" id="search-dropdown") Zarządzanie zespołem
+            div(class="dropdown-menu")
+              a(class="dropdown-item" href="/api/user") Pracownicy
+              a(class="dropdown-item" href="/api/user/team") Skład Zmiany
+          li(class="nav-item dropdown")
+            a(class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" id="search-dropdown") Wyszukiwanie
+            div(class="dropdown-menu")
+              a(class="dropdown-item" href="search/raport") Raporty
+              a(class="dropdown-item" href="/search/breakdown") Awarie
+
+  div(class='container-fluid')
+    div(class='row')
+      // navbar
+      aside(class='col-sm-2 my-3 umfy-vertical-navbar' id="umfy-borderless-card")
+        ul(class='nav flex-column')
+          div(class="card bg-gestampblue") 
+            div(class="card-body")
+              a(class="btn btn-link text-left btn-block text-light" type="button" href="/api/raport/create") Raport
+          div(class="card bg-gestampblue")
+            div(class="card-body")
+              a(class="btn btn-link text-left btn-block text-light" type="button" href="/api/plan") Prace planowane
+
+          div(class="accordion" id="accordionExample")   
+            div(class="card bg-gestampblue")
+              div(class="card-header" id="headingOne")
+                h2(class="mb-0")
+                  button(class="btn btn-link btn-block text-left collapsed text-light" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne")
+                    Collapsible Menedżer urządzeń
+              div(id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample")
+                div(class="card-body bg-light")
+                  a(class="dropdown-item" href="/api/line") Linie produkcyjne
+                  a(class="dropdown-item" href="/api/devicetype") Typy Urządzeń
+                  a(class="dropdown-item" href="/api/device") Urządzenia
+
+
+            div(class="card bg-gestampblue")
+              div(class="card-header" id="headingTwo")
+                h2(class="mb-0")
+                  button(class="btn btn-link btn-block text-left collapsed text-light" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo")
+                    Collapsible Zarządzanie zespołem
+              div(id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample")
+                div(class="card-body bg-light")
+                  a(class="dropdown-item" href="/api/user") Pracownicy
+                  a(class="dropdown-item" href="/api/user/team") Skład Zmiany
+
+            div(class="card bg-gestampblue")
+              div(class="card-header" id="headingThree")
+                h2(class="mb-0")
+                  button(class="btn btn-link btn-block text-left collapsed text-light" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree")
+                    Collapsible Wyszukiwanie
+              div(id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample")
+                div(class="card-body bg-light")
+                  a(class="dropdown-item" href="/api/search/raport") Raporty
+                  a(class="dropdown-item" href="/api/search/breakdown") Awarie
+
+      // main display
+      div(class='col')
+        div(class='row')
+
+          div(class="col-lg-6 my-4")
+            table(class="table table-bordered p-1" id="zeroTable")
+              a(class="btn btn-primary btn-block" type="button" onclick="activate(0)" id="zeroButton") Pracownicy
+              thead
+                tr
+                  th(scope="col") Imię
+                  th(scope="col") Nazwisko
+                  th(scope="col") Specjalizacja
+                  th(scope="col") -
+              tbody
+                each user in user_list
+                  if user.shift === 0
+                    tr
+                      td #{user.name}
+                      td #{user.surname}
+                      td #{user.spec}
+                      td
+                        button(class="btn btn-danger" type='button' value=user._id onclick="del(this)") -
+
+
+          div(class="col-lg-6 my-4")
+            table(class="table table-bordered  p-1" id="oneTable")
+              a(class="btn btn-warning btn-block" type="button" onclick="activate(1)" id="oneButton") Poranna
+              thead
+                tr
+                  th(scope="col") Imię
+                  th(scope="col") Nazwisko
+                  th(scope="col") Specjalizacja
+                  th(scope="col") -
+              tbody
+                each user in user_list
+                  if user.shift === 1 
+                    tr
+                      td #{user.name}
+                      td #{user.surname}
+                      td #{user.spec}
+                      td
+                        button(class="btn btn-danger" type='button' value=user._id onclick="del(this)") -
+
+            table(class="table table-bordered  p-1" id="twoTable")
+              a(class="btn btn-warning btn-block" type="button" onclick="activate(2)" id="twoButton") Popołudniowa
+              thead
+                tr
+                  th(scope="col") Imię
+                  th(scope="col") Nazwisko
+                  th(scope="col") Specjalizacja
+                  th(scope="col") -
+              tbody
+                each user in user_list
+                  if user.shift === 2 
+                    tr
+                      td #{user.name}
+                      td #{user.surname}
+                      td #{user.spec}
+                      td
+                        button(class="btn btn-danger" type='button' value=user._id onclick="del(this)") -
+
+            table(class="table table-bordered p-1 " id="threeTable")
+              a(class="btn btn-warning btn-block" type="button" onclick="activate(3)" id="threeButton") Nocna
+              thead
+                tr
+                  th(scope="col") Imię
+                  th(scope="col") Nazwisko
+                  th(scope="col") Specjalizacja
+                  th(scope="col") -
+              tbody
+                each user in user_list
+                  if user.shift === 3 
+                    tr
+                      td #{user.name}
+                      td #{user.surname}
+                      td #{user.spec}
+                      td
+                        button(class="btn btn-danger" type='button' value=user._id onclick="del(this)") -
+
+          div(class='col-sm-2')
+            form(method='POST' action='')
+              div.form-group
+                input#transfered.form-control(type='hidden' name='transfered' value='')
+              button.btn.btn-primary.align-self-end(type='submit') Zapisz
+          
+          div(class='col-sm-2 align-self-end')
+            button.btn.btn-secondary.align-self-end(type='button' onclick='moveup()') Do góry
+
+          if errors
+            ul
+                for error in errors
+                  li!=error.msg
+
+
+
+
+
+
+
+
