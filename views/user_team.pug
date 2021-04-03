@@ -84,6 +84,7 @@ head
   script.
     $(function(){
       $('form').submit(function(){
+          // when 'submit' button is pressed, fill the value of id='transfered' and then send
           document.getElementById('transfered').value = JSON.stringify(transferedUsers)
           //alert('This happened before submit. Clicking OK will proceed.');
       });
@@ -126,16 +127,23 @@ body
   div(class='container-fluid')
     div(class='row')
       // navbar
-      aside(class='col-sm-2 my-3 umfy-vertical-navbar' id="umfy-borderless-card")
-        ul(class='nav flex-column')
-          div(class="card bg-gestampblue") 
-            div(class="card-body")
-              a(class="btn btn-link text-left btn-block text-light" type="button" href="/api/raport/create") Raport
-          div(class="card bg-gestampblue")
-            div(class="card-body")
-              a(class="btn btn-link text-left btn-block text-light" type="button" href="/api/plan") Prace planowane
+      aside(class='col-sm-2 my-3 umfy-vertical-navbar')
 
-          div(class="accordion" id="accordionExample")   
+          div(class="accordion" id="accordionExample")
+          
+            div(class="card bg-gestampblue")
+              div(class="card-header" id="headingReport")
+                a(href="/api/raport/create")
+                  button(class="btn btn-link btn-block text-left  text-light" type="button")
+                    | Raport
+
+            div(class="card bg-gestampblue")
+              div(class="card-header" id="headingPlan")
+                a(href="/api/plan")
+                  button(class="btn btn-link btn-block text-left  text-light" type="button")
+                    | Prace planowane
+
+
             div(class="card bg-gestampblue")
               div(class="card-header" id="headingOne")
                 h2(class="mb-0")
@@ -157,7 +165,7 @@ body
                 div(class="card-body bg-light")
                   a(class="dropdown-item" href="/api/user") Pracownicy
                   a(class="dropdown-item" href="/api/user/team") Skład Zmiany
-
+              
             div(class="card bg-gestampblue")
               div(class="card-header" id="headingThree")
                 h2(class="mb-0")
@@ -250,7 +258,7 @@ body
           div(class='col-sm-2')
             form(method='POST' action='')
               div.form-group
-                input#transfered.form-control(type='hidden' name='transfered' value='')
+                input.form-control(id='transfered' type='hidden' name='transfered' value='')
               button.btn.btn-primary.align-self-end(type='submit') Zapisz
           
           div(class='col-sm-2 align-self-end')

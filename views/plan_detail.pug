@@ -9,10 +9,10 @@ block content
         else
           span.text-danger  Oczekujące
 
-      p #[strong Utworzone:] #{plan.date_created}
+      p #[strong Utworzone:] #{plan.virtual_date_created}
       p #[strong Opis:] #{plan.desc}
       p #[strong Zaplanował:] #{plan.user.fullname}
-      p #[strong Data realizacji:] #{plan.date_execution}
+      p #[strong Data realizacji:] #{plan.virtual_date_execution}
       p #[strong Zmiana realizująca plan:] #{plan.shift}
 
 
