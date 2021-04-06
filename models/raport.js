@@ -5,7 +5,9 @@ const Schema = mongoose.Schema
 const RaportSchema = new Schema({
   date: { type: Date, required: true },
   shift: { type: Number, required: true },
-  users: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  additional: { type: String },
+  usersPresent: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  usersMissing: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   plan: [{ type: Schema.Types.ObjectId, ref: 'Plan' }],
   inspection: {
     type: Schema.Types.ObjectId,

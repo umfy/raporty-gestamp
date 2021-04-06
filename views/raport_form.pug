@@ -12,21 +12,84 @@ head
   script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous")
     // Always remember to call the above files first before calling the bootstrap.min.js file
   script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous")
-
   script.
-    function postPresence(this_button){
-      // 'this' is a trick to pass 'raport.users' into script
-      // also added 'name' to transfer raport_id
-      // it looks weird but it works for me lol
-      // It comes as string so parse it back to object. Then iterate
-      activeUsers = JSON.parse(this_button.value)
-      postUsers = []
-      for(i = 0; i < activeUsers.length; i++){
-        postUsers.push([activeUsers[i]['_id'], document.getElementById(activeUsers[i]['_id']).checked])
-      }
-      console.log(postUsers)
-        $.post( "", {postUsers: JSON.stringify(postUsers), raportId: this_button.name});
-    }
+    $(document).ready(function(){
+      $("#addBreakdownButton").click(function(){
+        $('#breakdown').after('<div>' + 'kakao!' + '</div>')
+      })
+    })
+  script.
+    $(document).ready(function(){
+      $("#postAdditionalButton").click(function(){
+        let postAdditional = {}
+        postAdditional['_id'] = this.value
+        postAdditional['additional'] = document.querySelector("textarea.form-control.additional").value
+        $.post("", {action: "postAdditional", postAdditional: JSON.stringify(postAdditional)})
+      })
+    })
+  script.
+    $(document).ready(function() {
+      $("#postPlanButton").click(function(){
+        let plans = JSON.parse(this.value)
+
+        let postPlans = []
+        for(i=0; i<plans.length; i++){
+          let result = {}
+          result['_id'] = plans[i]._id
+          result['comments'] = document.querySelector("input.form-control._" + plans[i]._id).value
+          result['isDone'] = document.querySelector("input.form-check-input._" + plans[i]._id).checked
+
+          postPlans.push(result)
+        }
+        $.post("", {action: 'postPlan', postPlans: JSON.stringify(postPlans)})
+      }); 
+    });
+  script.
+    $(document).ready(function() {
+      $("#postPresenceButton").click(function(){
+        raport = JSON.parse(this.value)
+
+        let missing = raport.usersMissing
+        let present = raport.usersPresent
+
+        let usersMissing = []
+        let usersPresent = []
+
+        for (i=0; i<missing.length; i++){
+          if (document.getElementById(missing[i]['_id']).checked)
+          {
+            usersPresent.push(missing[i]['_id'])
+          } else {usersMissing.push(missing[i]['_id'])}
+        }
+
+        for (i=0; i<present.length; i++){
+          if (document.getElementById(present[i]['_id']).checked){
+            usersPresent.push(present[i]['_id'])
+          } else {usersMissing.push(present[i]['_id'])}
+        }
+        $.post("", {action: 'postPresence', usersPresent: JSON.stringify(usersPresent), usersMissing: JSON.stringify(usersMissing), raportId: raport._id})
+      }); 
+    });
+  script.
+    $(document).ready(function() {
+    $("#postPlacesButton").click(function(){
+        let inspectionPlaces = [
+        ['kettle', 'isKettle', 'Kotłownia'],
+        ['compressor', 'isCompressor', 'Kompresownia'],
+        ['ice', 'isIce', 'Wieża Chłodu'],
+        ['electric', 'isElectric', 'Rozdzielnia'],
+        ['workshop', 'isWorkshop', 'Warsztat'], ]
+
+        let postPlaces = {}
+
+        for (i=0; i<inspectionPlaces.length;i++ ){
+          postPlaces[inspectionPlaces[i][0]] = document.getElementById(inspectionPlaces[i][0]).value
+          postPlaces[inspectionPlaces[i][1]] = document.getElementById(inspectionPlaces[i][1]).checked
+        }
+        $.post("", {action: 'postInspection', postPlaces: JSON.stringify(postPlaces), inspectionId: this.value})
+    }); 
+    });
+
 body
   header
     nav(class="navbar navbar-dark bg-gestampblue navbar-expand-lg")
@@ -62,52 +125,52 @@ body
       // navbar
       aside(class='col-sm-2 my-3 umfy-vertical-navbar')
 
-          div(class="accordion" id="accordionExample")
-          
-            div(class="card bg-gestampblue")
-              div(class="card-header" id="headingReport")
-                a(href="/api/raport/create")
-                  button(class="btn btn-link btn-block text-left  text-light" type="button")
-                    | Raport
+        div(class="accordion" id="accordionExample")
 
-            div(class="card bg-gestampblue")
-              div(class="card-header" id="headingPlan")
-                a(href="/api/plan")
-                  button(class="btn btn-link btn-block text-left  text-light" type="button")
-                    | Prace planowane
+          div(class="card bg-gestampblue")
+            div(class="card-header" id="headingReport")
+              a(href="/api/raport/create")
+                button(class="btn btn-link btn-block text-left  text-light" type="button")
+                  | Raport
 
-
-            div(class="card bg-gestampblue")
-              div(class="card-header" id="headingOne")
-                h2(class="mb-0")
-                  button(class="btn btn-link btn-block text-left collapsed text-light" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne")
-                    Collapsible Menedżer urządzeń
-              div(id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample")
-                div(class="card-body bg-light")
-                  a(class="dropdown-item" href="/api/line") Linie produkcyjne
-                  a(class="dropdown-item" href="/api/devicetype") Typy Urządzeń
-                  a(class="dropdown-item" href="/api/device") Urządzenia
+          div(class="card bg-gestampblue")
+            div(class="card-header" id="headingPlan")
+              a(href="/api/plan")
+                button(class="btn btn-link btn-block text-left  text-light" type="button")
+                  | Prace planowane
 
 
-            div(class="card bg-gestampblue")
-              div(class="card-header" id="headingTwo")
-                h2(class="mb-0")
-                  button(class="btn btn-link btn-block text-left collapsed text-light" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo")
-                    Collapsible Zarządzanie zespołem
-              div(id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample")
-                div(class="card-body bg-light")
-                  a(class="dropdown-item" href="/api/user") Pracownicy
-                  a(class="dropdown-item" href="/api/user/team") Skład Zmiany
-              
-            div(class="card bg-gestampblue")
-              div(class="card-header" id="headingThree")
-                h2(class="mb-0")
-                  button(class="btn btn-link btn-block text-left collapsed text-light" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree")
-                    Collapsible Wyszukiwanie
-              div(id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample")
-                div(class="card-body bg-light")
-                  a(class="dropdown-item" href="/api/search/raport") Raporty
-                  a(class="dropdown-item" href="/api/search/breakdown") Awarie
+          div(class="card bg-gestampblue")
+            div(class="card-header" id="headingOne")
+              h2(class="mb-0")
+                button(class="btn btn-link btn-block text-left collapsed text-light" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne")
+                  Collapsible Menedżer urządzeń
+            div(id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample")
+              div(class="card-body bg-light")
+                a(class="dropdown-item" href="/api/line") Linie produkcyjne
+                a(class="dropdown-item" href="/api/devicetype") Typy Urządzeń
+                a(class="dropdown-item" href="/api/device") Urządzenia
+
+
+          div(class="card bg-gestampblue")
+            div(class="card-header" id="headingTwo")
+              h2(class="mb-0")
+                button(class="btn btn-link btn-block text-left collapsed text-light" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo")
+                  Collapsible Zarządzanie zespołem
+            div(id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample")
+              div(class="card-body bg-light")
+                a(class="dropdown-item" href="/api/user") Pracownicy
+                a(class="dropdown-item" href="/api/user/team") Skład Zmiany
+
+          div(class="card bg-gestampblue")
+            div(class="card-header" id="headingThree")
+              h2(class="mb-0")
+                button(class="btn btn-link btn-block text-left collapsed text-light" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree")
+                  Collapsible Wyszukiwanie
+            div(id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample")
+              div(class="card-body bg-light")
+                a(class="dropdown-item" href="/api/search/raport") Raporty
+                a(class="dropdown-item" href="/api/search/breakdown") Awarie
 
       // main display
       div(class='col')
@@ -121,7 +184,21 @@ body
                   th(scope="col") Specjalizacja
                   th(scope="col") Obecny
               tbody
-                  each user in raport.users
+                // in the route when 'raport' is created, presence is not passed as an argument so it's undefined
+                // checks on length prevent iterations over empty list AND if the presence is not saved for the first time, basic form generates
+
+
+                if (raport.usersPresent.length != 0)
+                  each user in raport.usersPresent
+                    tr
+                      td #{user.name}
+                      td #{user.surname}
+                      td #{user.spec}
+                      td
+                        div(class='form-check') 
+                          input(class="form-check-input" type="checkbox" name=user._id value=1 id=user._id checked=true)
+                if (raport.usersMissing.length != 0)
+                  each user in raport.usersMissing
                     tr
                       td #{user.name}
                       td #{user.surname}
@@ -130,26 +207,62 @@ body
                         div(class='form-check') 
                           input(class="form-check-input" type="checkbox" name=user._id value=1 id=user._id checked=false)
 
+
             div 
-              button(class="btn btn-primary mb-2" type='button' name=raport._id value=raport.users  onclick="postPresence(this)") Zapisz          
+              button(class="btn btn-primary mb-2" type='button' id='postPresenceButton' value=raport) Zapisz          
 
             table(class="table table-bordered") Obchód
               thead 
                 tr 
                   th(scope="col") Miejsce
-                  th(scope="col") Opis
+                  th(scope="col") Komentarz
                   th(scope="col") stan
               tbody
-                tr
-                  form(method='POST' action='')
-                    td Kotłownia
+                each place in inspectionPlaces
+                  tr
+                    td #{place[2]}
                     td 
-                      input(class="form-control" type="text")
+                      input(class="form-control" type="text" id=place[0] value=raport.inspection[place[0]])
                     td
                       div(class='form-check') 
-                        input(class="form-check-input" type="checkbox" name="kettle" value=1 checked=false)
-            div(class='col') Prace Planowane
+                        input(class="form-check-input" type="checkbox" id=place[1] value=1 checked=raport.inspection[place[1]])
+            div 
+              button(class="btn btn-primary mb-2" type='button' id="postPlacesButton" value=raport.inspection._id) Zapisz    
 
-            div(class='col') Działania dodatkowe
+            table(class='table table-bordered') Prace Planowane
+              thead 
+                tr
+                  th Opis
+                  th Komentarz
+                  th Stan
+              tbody
+                each item in raport.plan
+                  tr
+                    td #{item.desc}
+                    td
+                      input(class="form-control" class=("_" + item._id) type="text" value=item.comments)
+                      // if css class begins with number you have to transform it into unicode like so:
+                      // class='12'; document.querySelectorAll("input.form-control.\\31\\32")
+                      // https://mathiasbynens.be/notes/css-escapes
+                    td
+                      div(class='form-check') 
+                        input(class="form-check-input" class='_'+item._id type="checkbox" value=1 checked=item.isDone)
 
+
+            div 
+              button(class="btn btn-primary mb-2" type='button' value=raport.plan  id="postPlanButton") Zapisz          
+
+
+            
+            div(class="form-group") Dodatokwe informacje
+              textarea(class="form-control additional" rows="3" type="text" ) #{raport.additional}
+            div 
+              button(class="btn btn-primary" type='button' value=raport._id  id="postAdditionalButton") Zapisz    
+
+          // --- --- --- AWARIE --- --- ---
           div(class='col-lg-6 py-4') Awarie
+            div(id='breakdown')
+            div
+
+            div 
+              button(class="btn btn-danger" type='button' id="addBreakdownButton") Dodaj    

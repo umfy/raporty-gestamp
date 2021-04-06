@@ -205,7 +205,6 @@ exports.user_delete_post = function (req, res) {
 // Display user update form on GET.
 exports.user_update_get = function (req, res) {
   User.findById(req.params.id).exec(function (err, user) {
-    console.log('usr: ', user)
     if (err) {
       return next(err)
     }
