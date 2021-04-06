@@ -13,9 +13,96 @@ head
     // Always remember to call the above files first before calling the bootstrap.min.js file
   script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous")
   script.
+    // enable popovers
+    $(function () {
+    $('[data-toggle="popover"]').popover()
+    })
+  script.
     $(document).ready(function(){
       $("#addBreakdownButton").click(function(){
-        $('#breakdown').after('<div>' + 'kakao!' + '</div>')
+        $('#breakdown').after(`
+        <div class="col bg-secondary text-light">
+          <div class="row"> 
+            <div class="col"> 
+              <div class="form-group mt-2">
+              <label> Numer zlecenia </label>
+              <input class="form-control" type="text">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col"> 
+              <select class="form-control">
+              <option> Default select 1 </option>
+              <option> Default select 2 </option>
+              </select>
+            </div>
+            <div class="col">
+              <select class="form-control">
+              <option> Default select 3 </option>
+              <option> Default select 4 </option>
+              </select>
+            </div>
+            <div class="col"> 
+              <select class="form-control">
+              <option> Default select 5 </option>
+              <option> Default select 6 </option>
+              </select>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col">
+              <label for="appt"> Godzina rozpoczęcia awarii </label>
+              <input type="time" id="appt" name="appt">
+            </div>
+            <div class="col">
+              <label for="appt-end"> Godzina zakończenia awarii </label>
+              <input type="time" id="appt-end" name="appt-end">
+            </div> 
+          </div>
+          <div class="row">
+            <div class="col mt-3"> Diagnostyka
+              <textarea class="form-control" rows=2 type="text"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col mt-3"> Działanie
+              <textarea class="form-control" rows=2 type="text"></textarea>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col d-flex justify-content-between">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
+                <label class="form-check-label" for="inlineRadio1"> Naprawiono </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+                <label class="form-check-label" for="inlineRadio2"> Nie naprawiono </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3">
+                <label class="form-check-label" for="inlineRadio3"> Rozwiązanie tymczasowe </label>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col mt-3"> Uzyte części
+              <textarea class="form-control" rows=1 type="text"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col mt-3"> Części do zamówienia
+              <textarea class="form-control" rows=1 type="text"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col mt-3"> Prace na postój
+              <textarea class="form-control" rows=1 type="text"></textarea>
+            </div>
+          </div>
+          <hr>
+        </div>`)
       })
     })
   script.
@@ -176,7 +263,8 @@ body
       div(class='col')
         div(class='row')
           div(class='col-lg-6 py-4')
-            table(class='table table-bordered') Skład zmiany
+            table(class='table table-bordered')
+              caption Skład zmiany
               thead
                 tr
                   th(scope="col") Imię
@@ -208,10 +296,11 @@ body
                           input(class="form-check-input" type="checkbox" name=user._id value=1 id=user._id checked=false)
 
 
-            div 
-              button(class="btn btn-primary mb-2" type='button' id='postPresenceButton' value=raport) Zapisz          
+            div.float-right
+              button(class="btn btn-primary mb-2" type='button' id='postPresenceButton' value=raport data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz          
 
-            table(class="table table-bordered") Obchód
+            table(class="table table-bordered") 
+              caption Obchód
               thead 
                 tr 
                   th(scope="col") Miejsce
@@ -226,10 +315,11 @@ body
                     td
                       div(class='form-check') 
                         input(class="form-check-input" type="checkbox" id=place[1] value=1 checked=raport.inspection[place[1]])
-            div 
-              button(class="btn btn-primary mb-2" type='button' id="postPlacesButton" value=raport.inspection._id) Zapisz    
+            div.float-right
+              button(class="btn btn-primary mb-2" type='button' id="postPlacesButton" value=raport.inspection._id data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
 
-            table(class='table table-bordered') Prace Planowane
+            table(class='table table-bordered') 
+              caption Prace Planowane
               thead 
                 tr
                   th Opis
@@ -244,25 +334,29 @@ body
                       // if css class begins with number you have to transform it into unicode like so:
                       // class='12'; document.querySelectorAll("input.form-control.\\31\\32")
                       // https://mathiasbynens.be/notes/css-escapes
+                      // it's easier to add a non-numeric character at the begining of a class name
                     td
                       div(class='form-check') 
                         input(class="form-check-input" class='_'+item._id type="checkbox" value=1 checked=item.isDone)
 
 
-            div 
-              button(class="btn btn-primary mb-2" type='button' value=raport.plan  id="postPlanButton") Zapisz          
-
+            div.float-right
+              button(class="btn btn-primary mb-2 " type='button' value=raport.plan  id="postPlanButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz          
 
             
-            div(class="form-group") Dodatokwe informacje
-              textarea(class="form-control additional" rows="3" type="text" ) #{raport.additional}
-            div 
-              button(class="btn btn-primary" type='button' value=raport._id  id="postAdditionalButton") Zapisz    
+            div(class="form-group")
+              // table and caption just to be consistant with the layout
+              table(class='table umfy-ghost-table')
+                caption Dodatkowe informacje
+              textarea(class="form-control additional mt-1" rows=10 type="text") #{raport.additional}
+            div.float-right
+              button(class="btn btn-primary" type='button' value=raport._id  id="postAdditionalButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
 
           // --- --- --- AWARIE --- --- ---
-          div(class='col-lg-6 py-4') Awarie
+          div(class='col-lg-6 py-4') 
+            h2 Awarie
             div(id='breakdown')
             div
 
             div 
-              button(class="btn btn-danger" type='button' id="addBreakdownButton") Dodaj    
+              button(class="btn btn-danger my-4" type='button' id="addBreakdownButton") Dodaj    

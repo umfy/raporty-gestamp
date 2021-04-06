@@ -12,7 +12,7 @@ const BreakdownSchema = new Schema({
   diagnostics: { type: String },
   causes: { type: String },
   action: { type: String },
-  status: { type: Boolean },
+  status: { type: Number },
   plannedActions: { type: String },
   partsUsed: { type: String },
   partsToOrder: { type: String },

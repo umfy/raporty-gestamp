@@ -28,3 +28,14 @@ body {
 .table th {
   padding: 0.2rem;
 }
+
+.umfy-ghost-table {
+  margin: 0px;
+}
+
+input[type='time'] {
+  width: 100px;
+  text-align: center;
+  padding: 5px;
+  border-radius: 5px;
+}
