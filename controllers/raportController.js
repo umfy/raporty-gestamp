@@ -1,7 +1,11 @@
 const Raport = require('../models/raport')
 const User = require('../models/user')
 const Plan = require('../models/plan')
+const Line = require('../models/line')
+const Devicetype = require('../models/devicetype')
+const Device = require('../models/device')
 const Inspection = require('../models/inspection')
+const Breakdown = require('../models/breakdown')
 const async = require('async')
 
 function createEmptyInspection() {
@@ -61,22 +65,49 @@ exports.raport_create_get = function (req, res, next) {
   ]
 
   // check if Report for this day and shift exists
-  Raport.find({
-    date: {
-      $gte: today,
-      $lt: tomorrow,
+
+  async.parallel(
+    {
+      raport: function (callback) {
+        Raport.find({
+          date: {
+            $gte: today,
+            $lt: tomorrow,
+          },
+          shift: shift_num,
+        })
+          .populate('usersPresent')
+          .populate('usersMissing')
+          .populate('inspection')
+          .populate('plan')
+          .populate({
+            path: 'breakdown',
+            // populat nested array od ids
+            populate: { path: 'line' },
+          })
+          .exec(callback)
+      },
+      line: function (callback) {
+        Line.find()
+          .sort([['name', 'ascending']])
+          .exec(callback)
+      },
+      devicetype: function (callback) {
+        Devicetype.find()
+          .sort([['name', 'ascending']])
+          .exec(callback)
+      },
+      device: function (callback) {
+        Device.find()
+          .sort([['name', 'ascending']])
+          .exec(callback)
+      },
     },
-    shift: shift_num,
-  })
-    .populate('usersPresent')
-    .populate('usersMissing')
-    .populate('inspection')
-    .populate('plan')
-    .exec(function (err, raport) {
+    function (err, theresult) {
       if (err) {
         return next(err)
       }
-      if (Object.keys(raport).length == 0) {
+      if (Object.keys(theresult.raport).length == 0) {
         // no reports found
         // create new Report
         inspection = createEmptyInspection()
@@ -118,17 +149,25 @@ exports.raport_create_get = function (req, res, next) {
               res.render('raport_form', {
                 raport: raport,
                 inspectionPlaces: inspectionPlaces,
+                lineList: theresult.line,
+                devicetypeList: theresult.devicetype,
+                deviceList: theresult.device,
               })
             })
           }
         )
       } else {
+        // Report found
         res.render('raport_form', {
-          raport: raport[0],
+          raport: theresult.raport[0],
           inspectionPlaces: inspectionPlaces,
+          lineList: theresult.line,
+          devicetypeList: theresult.devicetype,
+          deviceList: theresult.device,
         })
       }
-    })
+    }
+  )
 }
 
 exports.raport_create_post = function (req, res, next) {
@@ -190,6 +229,39 @@ exports.raport_create_post = function (req, res, next) {
         }
       }
     )
+  }
+  if (req.body.action === 'postBreakdown') {
+    postBreakdown = JSON.parse(req.body.postBreakdown)
+    if (postBreakdown._id === undefined) {
+      //creating breakdown and updating repo
+      breakdown = new Breakdown(postBreakdown)
+      breakdown.save(function (err) {
+        if (err) {
+          return next(err)
+        }
+        Raport.findByIdAndUpdate(req.body.raportId, {
+          $push: { breakdown: { _id: breakdown._id } },
+        }).exec(function (err, succ) {
+          if (err) {
+            return next(err)
+          }
+          //console.log('succ', succ)
+        })
+      })
+      res.send(breakdown._id)
+    } else {
+      //updating breakdown
+      Breakdown.findByIdAndUpdate(
+        postBreakdown._id,
+        postBreakdown,
+        {},
+        function (err) {
+          if (err) {
+            return next(err)
+          }
+        }
+      )
+    }
   }
 }
 // Display raport delete form on GET.

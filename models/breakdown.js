@@ -10,12 +10,11 @@ const BreakdownSchema = new Schema({
   dateBegin: { type: Date },
   dateEnd: { type: Date },
   diagnostics: { type: String },
-  causes: { type: String },
-  action: { type: String },
+  treatment: { type: String },
   status: { type: Number },
-  plannedActions: { type: String },
   partsUsed: { type: String },
   partsToOrder: { type: String },
+  plannedActions: { type: String },
 })
 
 // Virtual for user's URL
@@ -24,4 +23,4 @@ BreakdownSchema.virtual('url').get(function () {
 })
 
 //Export model
-module.exports = mongoose.model('Breakdown', UserSchema)
+module.exports = mongoose.model('Breakdown', BreakdownSchema)

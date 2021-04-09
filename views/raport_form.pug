@@ -13,98 +13,206 @@ head
     // Always remember to call the above files first before calling the bootstrap.min.js file
   script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous")
   script.
+    $(document).ready(function(){
+      const beforeUnloadListener = (event) => {
+        event.preventDefault();
+        return event.returnValue = "Are you sure you want to exit?";
+      };
+      const nameInput = document.querySelector("#kettle");
+
+      nameInput.addEventListener("input", (event) => {
+        if (event.target.value !== "") {
+          addEventListener("beforeunload", beforeUnloadListener, {capture: true});
+        } else {
+          removeEventListener("beforeunload", beforeUnloadListener, {capture: true});
+        }
+      });
+    });
+  script.
     // enable popovers
     $(function () {
-    $('[data-toggle="popover"]').popover()
+      $('[data-toggle="popover"]').popover()
     })
   script.
     $(document).ready(function(){
       $("#addBreakdownButton").click(function(){
+        let temporaryId = document.querySelector('#breakdown').title
+        // Liczby Tarrota 
+        if (temporaryId.slice(-5) === 'IIIII'){
+           temporaryId = temporaryId.replace('IIIII', 'V')
+        }
+        if (temporaryId.slice(-2) === 'VV'){
+          temporaryId = temporaryId.replace('VV', 'X')
+        }
+        if (temporaryId.slice(-5) === 'XXXXX'){
+          temporaryId = temporaryId.replace('XXXXX', 'L')
+        }
+        document.querySelector('#breakdown').title = temporaryId+'I'
+
+        let selectElements = JSON.parse(this.value)
+        let raportId = this.name
+        let lines = selectElements[0]
+        let devicetypes = selectElements[1]
+        let devices = selectElements[2]
+        let lineList = ''
+        let devicetypeList = ''
+        let deviceList = ''
+        for (i=0; i<lines.length;i++) {
+        lineList = lineList + '<option value=' + lines[i]._id + '>' + lines[i].name + '</option>'
+        }
+        for (i=0; i<devicetypes.length;i++) {
+        devicetypeList = devicetypeList + '<option value=' + devicetypes[i]._id + '>' + devicetypes[i].name + '</option>'
+        }
+        for (i=0; i<lines.length;i++) {
+        deviceList = deviceList + '<option value=' + devices[i]._id + '>' + devices[i].name + '</option>'
+        }
         $('#breakdown').after(`
-        <div class="col bg-secondary text-light">
-          <div class="row"> 
-            <div class="col"> 
-              <div class="form-group mt-2">
-              <label> Numer zlecenia </label>
-              <input class="form-control" type="text">
-              </div>
+        <div class="accordion">
+          <div class="card">
+            <div class="card-header" id="AddBreakdownHeading">
+              <h2 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#`+temporaryId+`" aria-expanded="true" aria-controls="collapseOne">
+                  Nowa awaria `+ temporaryId +`
+                </button>
+              </h2>
+            </div>
+            <div id="`+temporaryId+`" class="collapse show" aria-labelledby="AddBreakdownHeading" data-parent="#accordionExample">
+              <div class="card-body">
+               
+                <div class="col bg-secondary text-light my-3 ">
+                  <div class="row"> 
+                    <div class="col"> 
+                      <div class="form-group mt-2">
+                      <label> Numer zlecenia </label>
+                      <input class="form-control orderNumber" type="text">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col"> 
+                      <select class="form-control line">`
+                      + lineList +
+                      `
+                      </select>
+                    </div>
+                    <div class="col">
+                      <select class="form-control devicetype">`
+                      + devicetypeList +
+                      `
+                      </select>
+                    </div>
+                    <div class="col"> 
+                      <select class="form-control device">`
+                      + deviceList +
+                      `
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row mt-3">
+                    <div class="col">
+                      <label for="appt`+temporaryId+`"> Godzina rozpoczęcia awarii </label>
+                      <input class="dateBegin" type="time" id="appt`+temporaryId+`" name="appt">
+                    </div>
+                    <div class="col">
+                      <label for="appt-end`+temporaryId+`"> Godzina zakończenia awarii </label>
+                      <input class="dateEnd" type="time" id="appt-end`+temporaryId+`" name="appt-end">
+                    </div> 
+                  </div>
+                  <div class="row">
+                    <div class="col mt-3"> Diagnostyka
+                      <textarea class="form-control diagnostics" rows=2 type="text"></textarea>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col mt-3"> Działanie
+                      <textarea class="form-control treatment" rows=2 type="text"></textarea>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col d-flex justify-content-between">
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input statusRepaired" type="radio" name="inlineRadioOptions" id="inlineRadio1`+temporaryId+`" value='1'>
+                        <label class="form-check-label" for="inlineRadio1`+temporaryId+`"> Naprawiono </label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input statusNotRepaired" type="radio" name="inlineRadioOptions" id="inlineRadio2`+temporaryId+`" value='2'>
+                        <label class="form-check-label" for="inlineRadio2`+temporaryId+`"> Nie naprawiono </label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input statusTemporary" type="radio" name="inlineRadioOptions" id="inlineRadio3"`+temporaryId+` value='3'>
+                        <label class="form-check-label" for="inlineRadio3`+temporaryId+`"> Rozwiązanie tymczasowe </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col mt-3"> Uzyte części
+                      <textarea class="form-control partsUsed" rows=1 type="text"></textarea>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col mt-3"> Części do zamówienia
+                      <textarea class="form-control partsToOrder" rows=1 type="text"></textarea>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col mt-3"> Prace na postój
+                      <textarea class="form-control plannedAction" rows=1 type="text"></textarea>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col mb-3">
+                      <button class="btn btn-primary mt-3 float-right" type='button' onclick='addBreakdown(this)' name=`+ raportId +`> Zapisz </button>       
+                    </div>
+                  </div>
+                </div>
+        
+               </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col"> 
-              <select class="form-control">
-              <option> Default select 1 </option>
-              <option> Default select 2 </option>
-              </select>
-            </div>
-            <div class="col">
-              <select class="form-control">
-              <option> Default select 3 </option>
-              <option> Default select 4 </option>
-              </select>
-            </div>
-            <div class="col"> 
-              <select class="form-control">
-              <option> Default select 5 </option>
-              <option> Default select 6 </option>
-              </select>
-            </div>
-          </div>
-          <div class="row mt-3">
-            <div class="col">
-              <label for="appt"> Godzina rozpoczęcia awarii </label>
-              <input type="time" id="appt" name="appt">
-            </div>
-            <div class="col">
-              <label for="appt-end"> Godzina zakończenia awarii </label>
-              <input type="time" id="appt-end" name="appt-end">
-            </div> 
-          </div>
-          <div class="row">
-            <div class="col mt-3"> Diagnostyka
-              <textarea class="form-control" rows=2 type="text"></textarea>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col mt-3"> Działanie
-              <textarea class="form-control" rows=2 type="text"></textarea>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col d-flex justify-content-between">
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-                <label class="form-check-label" for="inlineRadio1"> Naprawiono </label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
-                <label class="form-check-label" for="inlineRadio2"> Nie naprawiono </label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3">
-                <label class="form-check-label" for="inlineRadio3"> Rozwiązanie tymczasowe </label>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col mt-3"> Uzyte części
-              <textarea class="form-control" rows=1 type="text"></textarea>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col mt-3"> Części do zamówienia
-              <textarea class="form-control" rows=1 type="text"></textarea>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col mt-3"> Prace na postój
-              <textarea class="form-control" rows=1 type="text"></textarea>
-            </div>
-          </div>
-          <hr>
-        </div>`)
+        </div>
+        `)
       })
     })
+  script.
+    // jQuery way doesn't work for dynamically generated buttons idk why
+    function addBreakdown(this_cell){
+      let postBreakdown = {}
+      let breakdownDiv = ($(this_cell).parent().parent().parent())
+      let startDate = new Date()
+      let endDate = new(Date)
+      let startTime = (breakdownDiv.find("input.dateBegin")[0].value).split(':')
+      let endTime = (breakdownDiv.find("input.dateEnd")[0].value).split(':')
+      startDate.setHours(startTime[0], startTime[1])
+      endDate.setHours(endTime[0], endTime[1])
+
+      postBreakdown['_id'] = breakdownDiv.attr('id')
+      postBreakdown['orderNumber'] = breakdownDiv.find("input.form-control.orderNumber")[0].value
+      postBreakdown['line'] = breakdownDiv.find("select.line")[0].value
+      postBreakdown['devicetype'] = breakdownDiv.find("select.devicetype")[0].value
+      postBreakdown['device'] = breakdownDiv.find("select.device")[0].value
+      postBreakdown['dateBegin'] = startDate
+      postBreakdown['dateEnd'] = endDate
+      postBreakdown['diagnostics'] = breakdownDiv.find("textarea.diagnostics")[0].value
+      postBreakdown['treatment'] = breakdownDiv.find("textarea.treatment")[0].value
+
+      if (breakdownDiv.find("input.statusRepaired")[0].checked){
+        postBreakdown['status'] = 1
+      }
+      if (breakdownDiv.find("input.statusNotRepaired")[0].checked){
+        postBreakdown['status'] = 2
+      }
+      if (breakdownDiv.find("input.statusTemporary")[0].checked){
+        postBreakdown['status'] = 3
+      }
+
+      postBreakdown['partsUsed'] = breakdownDiv.find("textarea.partsUsed")[0].value
+      postBreakdown['partsToOrder'] = breakdownDiv.find("textarea.partsToOrder")[0].value
+      postBreakdown['plannedAction'] = breakdownDiv.find("textarea.plannedAction")[0].value
+
+      $.post("", {action: "postBreakdown", raportId: this_cell.name, postBreakdown: JSON.stringify(postBreakdown)}, function(data){
+        breakdownDiv.prop('id', data)
+      })
+    }
   script.
     $(document).ready(function(){
       $("#postAdditionalButton").click(function(){
@@ -160,20 +268,20 @@ head
   script.
     $(document).ready(function() {
     $("#postPlacesButton").click(function(){
-        let inspectionPlaces = [
-        ['kettle', 'isKettle', 'Kotłownia'],
-        ['compressor', 'isCompressor', 'Kompresownia'],
-        ['ice', 'isIce', 'Wieża Chłodu'],
-        ['electric', 'isElectric', 'Rozdzielnia'],
-        ['workshop', 'isWorkshop', 'Warsztat'], ]
+      let inspectionPlaces = [
+      ['kettle', 'isKettle', 'Kotłownia'],
+      ['compressor', 'isCompressor', 'Kompresownia'],
+      ['ice', 'isIce', 'Wieża Chłodu'],
+      ['electric', 'isElectric', 'Rozdzielnia'],
+      ['workshop', 'isWorkshop', 'Warsztat'], ]
 
-        let postPlaces = {}
+      let postPlaces = {}
 
-        for (i=0; i<inspectionPlaces.length;i++ ){
-          postPlaces[inspectionPlaces[i][0]] = document.getElementById(inspectionPlaces[i][0]).value
-          postPlaces[inspectionPlaces[i][1]] = document.getElementById(inspectionPlaces[i][1]).checked
-        }
-        $.post("", {action: 'postInspection', postPlaces: JSON.stringify(postPlaces), inspectionId: this.value})
+      for (i=0; i<inspectionPlaces.length;i++ ){
+        postPlaces[inspectionPlaces[i][0]] = document.getElementById(inspectionPlaces[i][0]).value
+        postPlaces[inspectionPlaces[i][1]] = document.getElementById(inspectionPlaces[i][1]).checked
+      }
+      $.post("", {action: 'postInspection', postPlaces: JSON.stringify(postPlaces), inspectionId: this.value})
     }); 
     });
 
@@ -262,7 +370,7 @@ body
       // main display
       div(class='col')
         div(class='row')
-          div(class='col-lg-6 py-4')
+          div(class='col-lg-5 py-4')
             table(class='table table-bordered')
               caption Skład zmiany
               thead
@@ -305,7 +413,7 @@ body
                 tr 
                   th(scope="col") Miejsce
                   th(scope="col") Komentarz
-                  th(scope="col") stan
+                  th(scope="col") Stan
               tbody
                 each place in inspectionPlaces
                   tr
@@ -343,7 +451,7 @@ body
             div.float-right
               button(class="btn btn-primary mb-2 " type='button' value=raport.plan  id="postPlanButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz          
 
-            
+
             div(class="form-group")
               // table and caption just to be consistant with the layout
               table(class='table umfy-ghost-table')
@@ -353,10 +461,88 @@ body
               button(class="btn btn-primary" type='button' value=raport._id  id="postAdditionalButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
 
           // --- --- --- AWARIE --- --- ---
-          div(class='col-lg-6 py-4') 
+          div(class='col-lg-7 py-4') 
             h2 Awarie
-            div(id='breakdown')
-            div
 
+            // breakdowns from DB:
+            div(class='accordion')
+              each breakdown in raport.breakdown
+                .card
+                  .card-header
+                    h5.mb-0
+                      // I added _ because I want other Div to have 'breakdown._id' as id.
+                      button.btn.btn-link(data-toggle='collapse' data-target=('#_'+breakdown._id) aria-expanded='true' aria-controls='collapseOne')
+                        | Awaria:  #{breakdown.diagnostics}
+                  .collapse(data-parent='#accordion' id='_'+breakdown._id)
+                    .card-body
+                      .col.bg-danger.text-light(id=breakdown._id)
+                        .row
+                          .col
+                            .form-group.mt-2
+                              label  Numer zlecenia 
+                              input.form-control.orderNumber(type='text' value=breakdown.orderNumber)
+                        .row
+                          .col
+                            select.form-control.line
+                              each item in lineList
+                                option(value=item._id selected=(breakdown.line._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
+                          .col
+                            select.form-control.devicetype
+                              each item in devicetypeList
+                                option(value=item._id selected=(breakdown.line._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
+                          .col
+                            select.form-control.device
+                              each item in deviceList
+                                option(value=item._id selected=(breakdown.line._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
+                        .row.mt-3
+                          .col
+                            label(for='appt')  Godzina rozpoczęcia awarii
+                            - var nDB = new Date(breakdown.dateBegin)
+                            // slice makes sure the format includes 0 in (12:01) for example
+                            input#appt.dateBegin(type='time' name='appt' value=(("0" + nDB.getHours()).slice(-2)+':'+("0" + nDB.getMinutes()).slice(-2)))
+                          .col
+                            label(for='appt-end')  Godzina zakończenia awarii 
+                            - var nDE = new Date(breakdown.dateEnd)
+                            input#appt-end.dateEnd(type='time' name='appt-end' value=(("0" + nDE.getHours()).slice(-2)+':'+("0" + nDE.getMinutes()).slice(-2)))
+                        .row
+                          .col.mt-3
+                            | Diagnostyka
+                            textarea.form-control.diagnostics(rows='2' type='text') #{breakdown.diagnostics}
+                        .row
+                          .col.mt-3
+                            | Działanie
+                            textarea.form-control.treatment(rows='2' type='text') #{breakdown.treatment}
+                        .row.mt-2
+                          .col.d-flex.justify-content-between
+                            .form-check.form-check-inline
+                              input#inlineRadio1.form-check-input.statusRepaired(type='radio' name='inlineRadioOptions' value='1' checked=(breakdown.status===1 ? true : false))
+                              label.form-check-label(for='inlineRadio1')  Naprawiono 
+                            .form-check.form-check-inline
+                              input#inlineRadio2.form-check-input.statusNotRepaired(type='radio' name='inlineRadioOptions' value='2' checked=(breakdown.status===2 ? true : false))
+                              label.form-check-label(for='inlineRadio2')  Nie naprawiono 
+                            .form-check.form-check-inline
+                              input#inlineRadio3.form-check-input.statusTemporary(type='radio' name='inlineRadioOptions' value='3' checked=(breakdown.status===3 ? true : false))
+                              label.form-check-label(for='inlineRadio3')  Rozwiązanie tymczasowe 
+                        .row
+                          .col.mt-3
+                            | Uzyte części
+                            textarea.form-control.partsUsed(rows='1' type='text') #{breakdown.partsUsed}
+                        .row
+                          .col.mt-3
+                            | Części do zamówienia
+                            textarea.form-control.partsToOrder(rows='1' type='text') #{breakdown.partsToOrder}
+                        .row
+                          .col.mt-3
+                            | Prace na postój
+                            textarea.form-control.plannedAction(rows='1' type='text') #{breakdown.plannedAction}
+                        .row
+                          .col.mb-3
+                            button.btn.btn-primary.mt-3.float-right(type='button' onclick='addBreakdown(this)')  Zapisz 
+              
+
+            // Add Breakdown Button
             div 
-              button(class="btn btn-danger my-4" type='button' id="addBreakdownButton") Dodaj    
+              button(class="btn btn-danger my-4" type='button' name=raport._id value=[lineList, devicetypeList, deviceList] id="addBreakdownButton") Dodaj    
+            div(id='breakdown' title="I")
+
+
