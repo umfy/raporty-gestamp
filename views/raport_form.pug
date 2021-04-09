@@ -14,24 +14,83 @@ head
   script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous")
   script.
     $(document).ready(function(){
-      const beforeUnloadListener = (event) => {
-        event.preventDefault();
-        return event.returnValue = "Are you sure you want to exit?";
-      };
-      const nameInput = document.querySelector("#kettle");
-
-      nameInput.addEventListener("input", (event) => {
-        if (event.target.value !== "") {
-          addEventListener("beforeunload", beforeUnloadListener, {capture: true});
-        } else {
-          removeEventListener("beforeunload", beforeUnloadListener, {capture: true});
-        }
+      // https://stackoverflow.com/a/48238659/13527337
+      "use strict";
+      (() => {
+      const modified_inputs = new Set;
+      const defaultValue = "defaultValue";
+      // store default values
+      addEventListener("beforeinput", (evt) => {
+          const target = evt.target;
+          if (!(defaultValue in target || defaultValue in target.dataset)) {
+              target.dataset[defaultValue] = ("" + (target.value || target.textContent)).trim();
+          }
       });
-    });
+      // detect input modifications
+      addEventListener("input", (evt) => {
+          const target = evt.target;
+          let original;
+          if (defaultValue in target) {
+              original = target[defaultValue];
+          } else {
+              original = target.dataset[defaultValue];
+          }
+          if (original !== ("" + (target.value || target.textContent)).trim()) {
+              if (!modified_inputs.has(target)) {
+                  modified_inputs.add(target);
+              }
+          } else if (modified_inputs.has(target)) {
+              modified_inputs.delete(target);
+          }
+          console.log(modified_inputs)
+      });
+      // clear modified inputs upon form submission
+      addEventListener("submit", (evt) => {
+          modified_inputs.clear();
+          // to prevent the warning from happening, it is advisable
+          // that you clear your form controls back to their default
+          // state with evt.target.reset() or form.reset() after submission
+      });
+      $("#postPlacesButton").click(function(){
+        let all = document.querySelectorAll("input.form-control.placesInput")
+        for (let i=0; i<all.length; i++){
+          modified_inputs.delete(all[i])
+        }
+      })
+      $("#postPlanButton").click(function(){
+        let all = document.querySelectorAll("input.form-control.planInput")
+        for (let i=0; i<all.length; i++){
+          modified_inputs.delete(all[i])
+        }
+      })
+      $("#postAdditionalButton").click(function(){
+        modified_inputs.delete(document.querySelector("textarea.form-control.additionalTextarea"))
+      })
+      $(".updateBreakdownButton").click(function(){
+        let all = document.querySelectorAll(".Breakdown"+this.id)
+        for (let i=0; i<all.length; i++){
+          modified_inputs.delete(all[i])
+        }
+      })
+      // here goes create button
+ 
+      // warn before closing if any inputs are modified
+      addEventListener("beforeunload", (evt) => {
+          if (modified_inputs.size) {
+              const unsaved_changes_warning = "Changes you made may not be saved.";
+              evt.returnValue = unsaved_changes_warning;
+              return unsaved_changes_warning;
+          }
+      });
+      })();
+    })
+
   script.
     // enable popovers
-    $(function () {
-      $('[data-toggle="popover"]').popover()
+    $(document).ready(function(){
+      $(function () {
+        $('[data-toggle="popover"]').popover()
+      })
     })
   script.
     $(document).ready(function(){
@@ -57,13 +116,13 @@ head
         let lineList = ''
         let devicetypeList = ''
         let deviceList = ''
-        for (i=0; i<lines.length;i++) {
+        for (let i=0; i<lines.length;i++) {
         lineList = lineList + '<option value=' + lines[i]._id + '>' + lines[i].name + '</option>'
         }
-        for (i=0; i<devicetypes.length;i++) {
+        for (let i=0; i<devicetypes.length;i++) {
         devicetypeList = devicetypeList + '<option value=' + devicetypes[i]._id + '>' + devicetypes[i].name + '</option>'
         }
-        for (i=0; i<lines.length;i++) {
+        for (let i=0; i<lines.length;i++) {
         deviceList = deviceList + '<option value=' + devices[i]._id + '>' + devices[i].name + '</option>'
         }
         $('#breakdown').after(`
@@ -84,25 +143,25 @@ head
                     <div class="col"> 
                       <div class="form-group mt-2">
                       <label> Numer zlecenia </label>
-                      <input class="form-control orderNumber" type="text">
+                      <input class="form-control orderNumber `+temporaryId+`" type="text">
                       </div>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col"> 
-                      <select class="form-control line">`
+                      <select class="form-control line `+temporaryId+`">`
                       + lineList +
                       `
                       </select>
                     </div>
                     <div class="col">
-                      <select class="form-control devicetype">`
+                      <select class="form-control devicetype `+temporaryId+`">`
                       + devicetypeList +
                       `
                       </select>
                     </div>
                     <div class="col"> 
-                      <select class="form-control device">`
+                      <select class="form-control device `+temporaryId+`">`
                       + deviceList +
                       `
                       </select>
@@ -111,57 +170,57 @@ head
                   <div class="row mt-3">
                     <div class="col">
                       <label for="appt`+temporaryId+`"> Godzina rozpoczęcia awarii </label>
-                      <input class="dateBegin" type="time" id="appt`+temporaryId+`" name="appt">
+                      <input class="dateBegin `+temporaryId+`" type="time" id="appt`+temporaryId+`" name="appt">
                     </div>
                     <div class="col">
                       <label for="appt-end`+temporaryId+`"> Godzina zakończenia awarii </label>
-                      <input class="dateEnd" type="time" id="appt-end`+temporaryId+`" name="appt-end">
+                      <input class="dateEnd `+temporaryId+`" type="time" id="appt-end`+temporaryId+`" name="appt-end">
                     </div> 
                   </div>
                   <div class="row">
                     <div class="col mt-3"> Diagnostyka
-                      <textarea class="form-control diagnostics" rows=2 type="text"></textarea>
+                      <textarea class="form-control diagnostics `+temporaryId+`" rows=2 type="text"></textarea>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col mt-3"> Działanie
-                      <textarea class="form-control treatment" rows=2 type="text"></textarea>
+                      <textarea class="form-control treatment `+temporaryId+`" rows=2 type="text"></textarea>
                     </div>
                   </div>
                   <div class="row mt-2">
                     <div class="col d-flex justify-content-between">
                       <div class="form-check form-check-inline">
-                        <input class="form-check-input statusRepaired" type="radio" name="inlineRadioOptions" id="inlineRadio1`+temporaryId+`" value='1'>
-                        <label class="form-check-label" for="inlineRadio1`+temporaryId+`"> Naprawiono </label>
+                        <input class="form-check-input statusRepaired `+temporaryId+`" type="radio" name="inlineRadioOptions" id="inlineRadio1`+temporaryId+`" value='1'>
+                        <label class="form-check-label" for="inlineRadio1"> Naprawiono </label>
                       </div>
                       <div class="form-check form-check-inline">
-                        <input class="form-check-input statusNotRepaired" type="radio" name="inlineRadioOptions" id="inlineRadio2`+temporaryId+`" value='2'>
-                        <label class="form-check-label" for="inlineRadio2`+temporaryId+`"> Nie naprawiono </label>
+                        <input class="form-check-input statusNotRepaired `+temporaryId+`" type="radio" name="inlineRadioOptions" id="inlineRadio2`+temporaryId+`" value='2'>
+                        <label class="form-check-label" for="inlineRadio2"> Nie naprawiono </label>
                       </div>
                       <div class="form-check form-check-inline">
-                        <input class="form-check-input statusTemporary" type="radio" name="inlineRadioOptions" id="inlineRadio3"`+temporaryId+` value='3'>
-                        <label class="form-check-label" for="inlineRadio3`+temporaryId+`"> Rozwiązanie tymczasowe </label>
+                        <input class="form-check-input statusTemporary `+temporaryId+`" type="radio" name="inlineRadioOptions" id="inlineRadio3"`+temporaryId+` value='3'>
+                        <label class="form-check-label" for="inlineRadio3"> Rozwiązanie tymczasowe </label>
                       </div>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col mt-3"> Uzyte części
-                      <textarea class="form-control partsUsed" rows=1 type="text"></textarea>
+                      <textarea class="form-control partsUsed `+temporaryId+`" rows=1 type="text"></textarea>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col mt-3"> Części do zamówienia
-                      <textarea class="form-control partsToOrder" rows=1 type="text"></textarea>
+                      <textarea class="form-control partsToOrder `+temporaryId+`" rows=1 type="text"></textarea>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col mt-3"> Prace na postój
-                      <textarea class="form-control plannedAction" rows=1 type="text"></textarea>
+                      <textarea class="form-control plannedAction `+temporaryId+`" rows=1 type="text"></textarea>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col mb-3">
-                      <button class="btn btn-primary mt-3 float-right" type='button' onclick='addBreakdown(this)' name=`+ raportId +`> Zapisz </button>       
+                      <button class="btn btn-primary mt-3 float-right" type='button' value=`+temporaryId+` onclick='addBreakdown(this)' name=`+ raportId +`> Zapisz </button>       
                     </div>
                   </div>
                 </div>
@@ -218,7 +277,7 @@ head
       $("#postAdditionalButton").click(function(){
         let postAdditional = {}
         postAdditional['_id'] = this.value
-        postAdditional['additional'] = document.querySelector("textarea.form-control.additional").value
+        postAdditional['additional'] = document.querySelector("textarea.form-control.additionalTextarea").value
         $.post("", {action: "postAdditional", postAdditional: JSON.stringify(postAdditional)})
       })
     })
@@ -228,7 +287,7 @@ head
         let plans = JSON.parse(this.value)
 
         let postPlans = []
-        for(i=0; i<plans.length; i++){
+        for(let i=0; i<plans.length; i++){
           let result = {}
           result['_id'] = plans[i]._id
           result['comments'] = document.querySelector("input.form-control._" + plans[i]._id).value
@@ -250,14 +309,14 @@ head
         let usersMissing = []
         let usersPresent = []
 
-        for (i=0; i<missing.length; i++){
+        for (let i=0; i<missing.length; i++){
           if (document.getElementById(missing[i]['_id']).checked)
           {
             usersPresent.push(missing[i]['_id'])
           } else {usersMissing.push(missing[i]['_id'])}
         }
 
-        for (i=0; i<present.length; i++){
+        for (let i=0; i<present.length; i++){
           if (document.getElementById(present[i]['_id']).checked){
             usersPresent.push(present[i]['_id'])
           } else {usersMissing.push(present[i]['_id'])}
@@ -277,7 +336,7 @@ head
 
       let postPlaces = {}
 
-      for (i=0; i<inspectionPlaces.length;i++ ){
+      for (let i=0; i<inspectionPlaces.length;i++ ){
         postPlaces[inspectionPlaces[i][0]] = document.getElementById(inspectionPlaces[i][0]).value
         postPlaces[inspectionPlaces[i][1]] = document.getElementById(inspectionPlaces[i][1]).checked
       }
@@ -419,7 +478,7 @@ body
                   tr
                     td #{place[2]}
                     td 
-                      input(class="form-control" type="text" id=place[0] value=raport.inspection[place[0]])
+                      input(class="form-control placesInput" type="text" id=place[0] value=raport.inspection[place[0]])
                     td
                       div(class='form-check') 
                         input(class="form-check-input" type="checkbox" id=place[1] value=1 checked=raport.inspection[place[1]])
@@ -438,7 +497,7 @@ body
                   tr
                     td #{item.desc}
                     td
-                      input(class="form-control" class=("_" + item._id) type="text" value=item.comments)
+                      input(class="form-control planInput" class=("_" + item._id) type="text" value=item.comments)
                       // if css class begins with number you have to transform it into unicode like so:
                       // class='12'; document.querySelectorAll("input.form-control.\\31\\32")
                       // https://mathiasbynens.be/notes/css-escapes
@@ -456,7 +515,7 @@ body
               // table and caption just to be consistant with the layout
               table(class='table umfy-ghost-table')
                 caption Dodatkowe informacje
-              textarea(class="form-control additional mt-1" rows=10 type="text") #{raport.additional}
+              textarea(class="form-control additionalTextarea mt-1" rows=10 type="text") #{raport.additional}
             div.float-right
               button(class="btn btn-primary" type='button' value=raport._id  id="postAdditionalButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
 
@@ -480,7 +539,7 @@ body
                           .col
                             .form-group.mt-2
                               label  Numer zlecenia 
-                              input.form-control.orderNumber(type='text' value=breakdown.orderNumber)
+                              input.form-control.orderNumber(class=("BreakdownB_"+breakdown._id) type='text' value=breakdown.orderNumber)
                         .row
                           .col
                             select.form-control.line
@@ -489,29 +548,29 @@ body
                           .col
                             select.form-control.devicetype
                               each item in devicetypeList
-                                option(value=item._id selected=(breakdown.line._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
+                                option(value=item._id selected=(breakdown.devicetype._id.toString()===item._id.toString() ? 'selected' : false))  #{item.name}
                           .col
                             select.form-control.device
                               each item in deviceList
-                                option(value=item._id selected=(breakdown.line._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
+                                option(value=item._id selected=(breakdown.device._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
                         .row.mt-3
                           .col
                             label(for='appt')  Godzina rozpoczęcia awarii
                             - var nDB = new Date(breakdown.dateBegin)
                             // slice makes sure the format includes 0 in (12:01) for example
-                            input#appt.dateBegin(type='time' name='appt' value=(("0" + nDB.getHours()).slice(-2)+':'+("0" + nDB.getMinutes()).slice(-2)))
+                            input#appt.dateBegin(class=("BreakdownB_"+breakdown._id) type='time' name='appt' value=(("0" + nDB.getHours()).slice(-2)+':'+("0" + nDB.getMinutes()).slice(-2)))
                           .col
                             label(for='appt-end')  Godzina zakończenia awarii 
                             - var nDE = new Date(breakdown.dateEnd)
-                            input#appt-end.dateEnd(type='time' name='appt-end' value=(("0" + nDE.getHours()).slice(-2)+':'+("0" + nDE.getMinutes()).slice(-2)))
+                            input#appt-end.dateEnd(class=("BreakdownB_"+breakdown._id) type='time' name='appt-end' value=(("0" + nDE.getHours()).slice(-2)+':'+("0" + nDE.getMinutes()).slice(-2)))
                         .row
                           .col.mt-3
                             | Diagnostyka
-                            textarea.form-control.diagnostics(rows='2' type='text') #{breakdown.diagnostics}
+                            textarea.form-control.diagnostics(class=("BreakdownB_"+breakdown._id) rows='2' type='text') #{breakdown.diagnostics}
                         .row
                           .col.mt-3
                             | Działanie
-                            textarea.form-control.treatment(rows='2' type='text') #{breakdown.treatment}
+                            textarea.form-control.treatment(class=("BreakdownB_"+breakdown._id) rows='2' type='text') #{breakdown.treatment}
                         .row.mt-2
                           .col.d-flex.justify-content-between
                             .form-check.form-check-inline
@@ -526,18 +585,18 @@ body
                         .row
                           .col.mt-3
                             | Uzyte części
-                            textarea.form-control.partsUsed(rows='1' type='text') #{breakdown.partsUsed}
+                            textarea.form-control.partsUsed(class=("BreakdownB_"+breakdown._id) rows='1' type='text') #{breakdown.partsUsed}
                         .row
                           .col.mt-3
                             | Części do zamówienia
-                            textarea.form-control.partsToOrder(rows='1' type='text') #{breakdown.partsToOrder}
+                            textarea.form-control.partsToOrder(class=("BreakdownB_"+breakdown._id) rows='1' type='text') #{breakdown.partsToOrder}
                         .row
                           .col.mt-3
                             | Prace na postój
-                            textarea.form-control.plannedAction(rows='1' type='text') #{breakdown.plannedAction}
+                            textarea.form-control.plannedAction(class=("BreakdownB_"+breakdown._id) rows='1' type='text') #{breakdown.plannedAction}
                         .row
                           .col.mb-3
-                            button.btn.btn-primary.mt-3.float-right(type='button' onclick='addBreakdown(this)')  Zapisz 
+                            button.btn.btn-primary.mt-3.float-right(class="updateBreakdownButton" type="button" id=("B_"+breakdown._id) onclick="addBreakdown(this)" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!")  Zapisz 
               
 
             // Add Breakdown Button

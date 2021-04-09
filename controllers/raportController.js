@@ -85,6 +85,16 @@ exports.raport_create_get = function (req, res, next) {
             // populat nested array od ids
             populate: { path: 'line' },
           })
+          .populate({
+            path: 'breakdown',
+            // populat nested array od ids
+            populate: { path: 'devicetype' },
+          })
+          .populate({
+            path: 'breakdown',
+            // populat nested array od ids
+            populate: { path: 'device' },
+          })
           .exec(callback)
       },
       line: function (callback) {

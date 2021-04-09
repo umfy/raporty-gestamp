@@ -14,7 +14,7 @@ const BreakdownSchema = new Schema({
   status: { type: Number },
   partsUsed: { type: String },
   partsToOrder: { type: String },
-  plannedActions: { type: String },
+  plannedAction: { type: String },
 })
 
 // Virtual for user's URL
