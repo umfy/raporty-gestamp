@@ -73,6 +73,13 @@ head
         }
       })
       // here goes create button
+      $( "#breakdown" ).click(function(e, data) {
+        // #breakdown is invissible div that you can't really click
+        let all = document.querySelectorAll('.'+data.tempId)
+        for (let i=0; i<all.length; i++){
+          modified_inputs.delete(all[i])
+        }
+      });
  
       // warn before closing if any inputs are modified
       addEventListener("beforeunload", (evt) => {
@@ -95,7 +102,7 @@ head
   script.
     $(document).ready(function(){
       $("#addBreakdownButton").click(function(){
-        let temporaryId = document.querySelector('#breakdown').title
+        let temporaryId = document.querySelector('#breakdown').title + 'I'
         // Liczby Tarrota 
         if (temporaryId.slice(-5) === 'IIIII'){
            temporaryId = temporaryId.replace('IIIII', 'V')
@@ -106,13 +113,10 @@ head
         if (temporaryId.slice(-5) === 'XXXXX'){
           temporaryId = temporaryId.replace('XXXXX', 'L')
         }
-        document.querySelector('#breakdown').title = temporaryId+'I'
-
-        let selectElements = JSON.parse(this.value)
-        let raportId = this.name
-        let lines = selectElements[0]
-        let devicetypes = selectElements[1]
-        let devices = selectElements[2]
+        document.querySelector('#breakdown').title = temporaryId
+        let lines = !{JSON.stringify(lineList)}
+        let devicetypes = !{JSON.stringify(devicetypeList)}
+        let devices = !{JSON.stringify(deviceList)}
         let lineList = ''
         let devicetypeList = ''
         let deviceList = ''
@@ -136,9 +140,9 @@ head
               </h2>
             </div>
             <div id="`+temporaryId+`" class="collapse show" aria-labelledby="AddBreakdownHeading" data-parent="#accordionExample">
-              <div class="card-body">
+              <div class="card-body umfy-card-body">
                
-                <div class="col bg-secondary text-light my-3 ">
+                <div class="col bg-secondary text-light ">
                   <div class="row"> 
                     <div class="col"> 
                       <div class="form-group mt-2">
@@ -220,7 +224,7 @@ head
                   </div>
                   <div class="row">
                     <div class="col mb-3">
-                      <button class="btn btn-primary mt-3 float-right" type='button' value=`+temporaryId+` onclick='addBreakdown(this)' name=`+ raportId +`> Zapisz </button>       
+                      <button class="btn btn-primary mt-3 float-right saveBreakdownButton" type='button' value=`+temporaryId+` onclick='addBreakdown(this)'> Zapisz </button>       
                     </div>
                   </div>
                 </div>
@@ -233,50 +237,56 @@ head
       })
     })
   script.
-    // jQuery way doesn't work for dynamically generated buttons idk why
-    function addBreakdown(this_cell){
-      let postBreakdown = {}
-      let breakdownDiv = ($(this_cell).parent().parent().parent())
-      let startDate = new Date()
-      let endDate = new(Date)
-      let startTime = (breakdownDiv.find("input.dateBegin")[0].value).split(':')
-      let endTime = (breakdownDiv.find("input.dateEnd")[0].value).split(':')
-      startDate.setHours(startTime[0], startTime[1])
-      endDate.setHours(endTime[0], endTime[1])
+      function addBreakdown(this_cell){
+        // if this_cell has value it means it's created dynamically via html above. Value is I, II, III...
+        // it triggers invissible div '#breakdown' which is handled in 'beforeunload' script
+        if (this_cell.value){
+          $("#breakdown").trigger('click', [{tempId:this_cell.value}])
 
-      postBreakdown['_id'] = breakdownDiv.attr('id')
-      postBreakdown['orderNumber'] = breakdownDiv.find("input.form-control.orderNumber")[0].value
-      postBreakdown['line'] = breakdownDiv.find("select.line")[0].value
-      postBreakdown['devicetype'] = breakdownDiv.find("select.devicetype")[0].value
-      postBreakdown['device'] = breakdownDiv.find("select.device")[0].value
-      postBreakdown['dateBegin'] = startDate
-      postBreakdown['dateEnd'] = endDate
-      postBreakdown['diagnostics'] = breakdownDiv.find("textarea.diagnostics")[0].value
-      postBreakdown['treatment'] = breakdownDiv.find("textarea.treatment")[0].value
+        }
+        let raportId = !{JSON.stringify(raport._id)}     
+        let postBreakdown = {}
+        let breakdownDiv = ($(this_cell).parent().parent().parent())
+        let startDate = new Date()
+        let endDate = new(Date)
+        let startTime = (breakdownDiv.find("input.dateBegin")[0].value).split(':')
+        let endTime = (breakdownDiv.find("input.dateEnd")[0].value).split(':')
+        startDate.setHours(startTime[0], startTime[1])
+        endDate.setHours(endTime[0], endTime[1])
 
-      if (breakdownDiv.find("input.statusRepaired")[0].checked){
-        postBreakdown['status'] = 1
+        postBreakdown['_id'] = breakdownDiv.attr('id')
+        postBreakdown['orderNumber'] = breakdownDiv.find("input.form-control.orderNumber")[0].value
+        postBreakdown['line'] = breakdownDiv.find("select.line")[0].value
+        postBreakdown['devicetype'] = breakdownDiv.find("select.devicetype")[0].value
+        postBreakdown['device'] = breakdownDiv.find("select.device")[0].value
+        postBreakdown['dateBegin'] = startDate
+        postBreakdown['dateEnd'] = endDate
+        postBreakdown['diagnostics'] = breakdownDiv.find("textarea.diagnostics")[0].value
+        postBreakdown['treatment'] = breakdownDiv.find("textarea.treatment")[0].value
+
+        if (breakdownDiv.find("input.statusRepaired")[0].checked){
+          postBreakdown['status'] = 1
+        }
+        if (breakdownDiv.find("input.statusNotRepaired")[0].checked){
+          postBreakdown['status'] = 2
+        }
+        if (breakdownDiv.find("input.statusTemporary")[0].checked){
+          postBreakdown['status'] = 3
+        }
+
+        postBreakdown['partsUsed'] = breakdownDiv.find("textarea.partsUsed")[0].value
+        postBreakdown['partsToOrder'] = breakdownDiv.find("textarea.partsToOrder")[0].value
+        postBreakdown['plannedAction'] = breakdownDiv.find("textarea.plannedAction")[0].value
+
+        $.post("", {action: "postBreakdown", raportId: raportId, postBreakdown: JSON.stringify(postBreakdown)}, function(data){
+          breakdownDiv.prop('id', data)
+        })
       }
-      if (breakdownDiv.find("input.statusNotRepaired")[0].checked){
-        postBreakdown['status'] = 2
-      }
-      if (breakdownDiv.find("input.statusTemporary")[0].checked){
-        postBreakdown['status'] = 3
-      }
-
-      postBreakdown['partsUsed'] = breakdownDiv.find("textarea.partsUsed")[0].value
-      postBreakdown['partsToOrder'] = breakdownDiv.find("textarea.partsToOrder")[0].value
-      postBreakdown['plannedAction'] = breakdownDiv.find("textarea.plannedAction")[0].value
-
-      $.post("", {action: "postBreakdown", raportId: this_cell.name, postBreakdown: JSON.stringify(postBreakdown)}, function(data){
-        breakdownDiv.prop('id', data)
-      })
-    }
   script.
     $(document).ready(function(){
       $("#postAdditionalButton").click(function(){
         let postAdditional = {}
-        postAdditional['_id'] = this.value
+        postAdditional['_id'] = !{JSON.stringify(raport._id)}
         postAdditional['additional'] = document.querySelector("textarea.form-control.additionalTextarea").value
         $.post("", {action: "postAdditional", postAdditional: JSON.stringify(postAdditional)})
       })
@@ -284,7 +294,7 @@ head
   script.
     $(document).ready(function() {
       $("#postPlanButton").click(function(){
-        let plans = JSON.parse(this.value)
+        let plans = !{JSON.stringify(raport.plan)}
 
         let postPlans = []
         for(let i=0; i<plans.length; i++){
@@ -301,7 +311,7 @@ head
   script.
     $(document).ready(function() {
       $("#postPresenceButton").click(function(){
-        raport = JSON.parse(this.value)
+        raport = !{JSON.stringify(raport)}
 
         let missing = raport.usersMissing
         let present = raport.usersPresent
@@ -334,13 +344,14 @@ head
       ['electric', 'isElectric', 'Rozdzielnia'],
       ['workshop', 'isWorkshop', 'Warsztat'], ]
 
+      let inspectionId = !{JSON.stringify(raport.inspection._id)}
       let postPlaces = {}
 
       for (let i=0; i<inspectionPlaces.length;i++ ){
         postPlaces[inspectionPlaces[i][0]] = document.getElementById(inspectionPlaces[i][0]).value
         postPlaces[inspectionPlaces[i][1]] = document.getElementById(inspectionPlaces[i][1]).checked
       }
-      $.post("", {action: 'postInspection', postPlaces: JSON.stringify(postPlaces), inspectionId: this.value})
+      $.post("", {action: 'postInspection', postPlaces: JSON.stringify(postPlaces), inspectionId: inspectionId})
     }); 
     });
 
@@ -464,7 +475,7 @@ body
 
 
             div.float-right
-              button(class="btn btn-primary mb-2" type='button' id='postPresenceButton' value=raport data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz          
+              button(class="btn btn-primary mb-2" type='button' id='postPresenceButton' data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz          
 
             table(class="table table-bordered") 
               caption Obchód
@@ -483,7 +494,7 @@ body
                       div(class='form-check') 
                         input(class="form-check-input" type="checkbox" id=place[1] value=1 checked=raport.inspection[place[1]])
             div.float-right
-              button(class="btn btn-primary mb-2" type='button' id="postPlacesButton" value=raport.inspection._id data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
+              button(class="btn btn-primary mb-2" type='button' id="postPlacesButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
 
             table(class='table table-bordered') 
               caption Prace Planowane
@@ -508,7 +519,7 @@ body
 
 
             div.float-right
-              button(class="btn btn-primary mb-2 " type='button' value=raport.plan  id="postPlanButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz          
+              button(class="btn btn-primary mb-2 " type='button' id="postPlanButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz          
 
 
             div(class="form-group")
@@ -517,7 +528,7 @@ body
                 caption Dodatkowe informacje
               textarea(class="form-control additionalTextarea mt-1" rows=10 type="text") #{raport.additional}
             div.float-right
-              button(class="btn btn-primary" type='button' value=raport._id  id="postAdditionalButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
+              button(class="btn btn-primary" type='button'  id="postAdditionalButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
 
           // --- --- --- AWARIE --- --- ---
           div(class='col-lg-7 py-4') 
@@ -533,7 +544,7 @@ body
                       button.btn.btn-link(data-toggle='collapse' data-target=('#_'+breakdown._id) aria-expanded='true' aria-controls='collapseOne')
                         | Awaria:  #{breakdown.diagnostics}
                   .collapse(data-parent='#accordion' id='_'+breakdown._id)
-                    .card-body
+                    .card-body.umfy-card-body
                       .col.bg-danger.text-light(id=breakdown._id)
                         .row
                           .col
@@ -542,17 +553,17 @@ body
                               input.form-control.orderNumber(class=("BreakdownB_"+breakdown._id) type='text' value=breakdown.orderNumber)
                         .row
                           .col
-                            select.form-control.line
+                            select.form-control.line(class=("BreakdownB_"+breakdown._id))
                               each item in lineList
-                                option(value=item._id selected=(breakdown.line._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
+                                option( value=item._id selected=(breakdown.line._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
                           .col
-                            select.form-control.devicetype
+                            select.form-control.devicetype(class=("BreakdownB_"+breakdown._id))
                               each item in devicetypeList
-                                option(value=item._id selected=(breakdown.devicetype._id.toString()===item._id.toString() ? 'selected' : false))  #{item.name}
+                                option( value=item._id selected=(breakdown.devicetype._id.toString()===item._id.toString() ? 'selected' : false))  #{item.name}
                           .col
-                            select.form-control.device
+                            select.form-control.device(class=("BreakdownB_"+breakdown._id))
                               each item in deviceList
-                                option(value=item._id selected=(breakdown.device._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
+                                option( value=item._id selected=(breakdown.device._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
                         .row.mt-3
                           .col
                             label(for='appt')  Godzina rozpoczęcia awarii
@@ -601,7 +612,7 @@ body
 
             // Add Breakdown Button
             div 
-              button(class="btn btn-danger my-4" type='button' name=raport._id value=[lineList, devicetypeList, deviceList] id="addBreakdownButton") Dodaj    
-            div(id='breakdown' title="I")
+              button(class="btn btn-danger my-4" type='button' id="addBreakdownButton") Dodaj    
+            div(id='breakdown' title="")
 
 

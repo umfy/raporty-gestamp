@@ -35,7 +35,7 @@ exports.raport_list = function (req, res, next) {
     if (err) {
       return next(err)
     }
-    res.render('raport_list', {
+    res.render('test', {
       title: 'Lista Raportów',
       raport_list: list_raports,
     })
@@ -50,7 +50,7 @@ exports.raport_detail = function (req, res, next) {
 // Display raport create form on GET.
 exports.raport_create_get = function (req, res, next) {
   // read SHIFT NUM from logged user
-  let shift_num = 3
+  let shift_num = 1
   let today = new Date()
   let tomorrow = new Date()
   today.setHours(0, 0, 0, 0)

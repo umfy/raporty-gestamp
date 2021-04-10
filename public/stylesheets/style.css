@@ -39,3 +39,6 @@ input[type='time'] {
   padding: 5px;
   border-radius: 5px;
 }
+.umfy-card-body {
+  padding: 0px;
+}
