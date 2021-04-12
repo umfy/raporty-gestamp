@@ -1,0 +1,18 @@
+extends layout
+block content
+   div(class='col')
+      div(class='row')
+         div(class='col h2 mr-5 d-flex justify-content-center umfy-clock')
+            iframe(src="https://free.timeanddate.com/clock/i7rdaqor/n591/tlpl31/fn13/fs48/ftb/tt0/tw0/tm3/tb4" frameborder="0" width="248" height="112")
+      div(class='row ')
+         div(class='col mr-5 d-flex justify-content-center') Otwórz dzisiejszy raport dla zmiany o numerze:
+      div(class='row pb-5')
+         div(class='col py-4 d-flex justify-content-center')
+            a(type="button" class="btn mx-1 btn-lg btn-block" class=(6 < today.getHours() && today.getHours() < 14 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/1") 
+               h2 1 
+         div(class='col py-4 d-flex justify-content-center') 
+            a(type="button" class="btn mx-1btn-lg btn-block" class=( 14 < today.getHours() && today.getHours() < 22 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/2") 
+               h2 2
+         div(class='col py-4 mr-5 d-flex justify-content-center')
+            a(type="button" class="btn mx-1 btn-lg btn-block" class=(22 < today.getHours() || today.getHours() < 6 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/3") 
+               h2 3

@@ -42,3 +42,8 @@ input[type='time'] {
 .umfy-card-body {
   padding: 0px;
 }
+
+.umfy-clock {
+  margin-top: 14px;
+  margin-bottom: 145px;
+}

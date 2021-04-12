@@ -4,6 +4,7 @@ head
   title= title
   meta(charset='utf-8')
   meta(name='viewport', content='width=device-width, initial-scale=1')
+  link(rel="shortcut icon" type="image/jpg" href="/images/favicon.ico")
   link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css", integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z", crossorigin="anonymous")
   link(rel='stylesheet', href='/stylesheets/style.css')
   link(href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;subset=latin-ext" rel="stylesheet")
@@ -19,6 +20,8 @@ head
       (() => {
       const modified_inputs = new Set;
       const defaultValue = "defaultValue";
+      const original_checked = new Set;
+      //const original_radio = new Set;
       // store default values
       addEventListener("beforeinput", (evt) => {
           const target = evt.target;
@@ -26,50 +29,125 @@ head
               target.dataset[defaultValue] = ("" + (target.value || target.textContent)).trim();
           }
       });
+        // save all checked values in 'original_checked'
+        let checkboxes = $("input[type=checkbox]")
+        let enabledSettings = [];
+        // Attach a change event handler to the checkboxes.
+          enabledSettings = checkboxes
+            .filter(":checked") // Filter out unchecked boxes.
+            .map(function() { // Extract values using jQuery map.
+              return this
+            }) 
+            .get() // Get array.
+          enabledSettings.forEach(item => original_checked.add(item))
+
+          //- // radio?
+          //- let radios = $("input[type=radio]")
+          //- let enabledRadioSettings = [];
+          //- // Attach a change event handler to the radios.
+          //-   enabledRadioSettings = radios
+          //-     .filter(":checked") // Filter out unchecked boxes.
+          //-     .map(function() { // Extract values using jQuery map.
+          //-       return this
+          //-     }) 
+          //-     .get() // Get array.
+          //-   enabledRadioSettings.forEach(item => original_radio.add(item))
+
+      
       // detect input modifications
       addEventListener("input", (evt) => {
           const target = evt.target;
           let original;
-          if (defaultValue in target) {
-              original = target[defaultValue];
-          } else {
-              original = target.dataset[defaultValue];
+          //console.log(target.type)
+          // TARGET TYPE TEXT
+          if (target.type === 'text' || target.type === 'textarea' || target.type === 'select-one' || target.type === 'time') {
+            if (defaultValue in target) {
+              // target[defaultValue] is target's initial value
+                original = target[defaultValue];
+            } else {
+              console.log('target.dataset[defaultValue]',target.dataset[defaultValue])
+                original = target.dataset[defaultValue];
+            }
+            if (original !== ("" + (target.value || target.textContent)).trim()) {
+              // if content of target is different than it's initial value
+                if (!modified_inputs.has(target)) {
+                    modified_inputs.add(target);
+                    target.style.color = 'tomato'
+                }
+            } else if (modified_inputs.has(target)) {
+              // if content of target is identical to original, delete it from the set
+                modified_inputs.delete(target);
+                console.log('deleting', target)
+                target.style.color = 'black'
+            }
+            console.log(modified_inputs)
           }
-          if (original !== ("" + (target.value || target.textContent)).trim()) {
-              if (!modified_inputs.has(target)) {
-                  modified_inputs.add(target);
-              }
-          } else if (modified_inputs.has(target)) {
-              modified_inputs.delete(target);
+          // TARGET TYPE CHECKBOX
+          if (target.type === 'checkbox'){
+            if (target.checked === true){
+            if (!original_checked.has(target)){
+              modified_inputs.add(target)
+              target.style.outline = '1px solid tomato'
+            } else {
+              modified_inputs.delete(target)
+              target.style.outline = '0px'
+            }
+          }
+          if (target.checked === false){
+            if (original_checked.has(target)){
+              modified_inputs.add(target)
+              target.style.outline = '1px solid tomato'
+            } else {
+              modified_inputs.delete(target)
+              target.style.outline = '0px'
+            }
           }
           console.log(modified_inputs)
+          }
+          //- if (target.type === 'radio'){
+          //-   console.log('radio')
+          //- }
       });
       // clear modified inputs upon form submission
-      addEventListener("submit", (evt) => {
-          modified_inputs.clear();
+      // addEventListener("submit", (evt) => {
+          //modified_inputs.clear();
           // to prevent the warning from happening, it is advisable
           // that you clear your form controls back to their default
           // state with evt.target.reset() or form.reset() after submission
-      });
-      $("#postPlacesButton").click(function(){
-        let all = document.querySelectorAll("input.form-control.placesInput")
+      //});
+      $("#postPresenceButton").click(function(){
+        let all = document.querySelectorAll("input.presenceInput")
         for (let i=0; i<all.length; i++){
           modified_inputs.delete(all[i])
+          all[i].style.outline = '0px'
+        }
+      })
+      $("#postPlacesButton").click(function(){
+        let all = document.querySelectorAll("input.placesInput")
+        for (let i=0; i<all.length; i++){
+          modified_inputs.delete(all[i])
+          all[i].style.color = 'black'
+          all[i].style.outline = '0px'
         }
       })
       $("#postPlanButton").click(function(){
-        let all = document.querySelectorAll("input.form-control.planInput")
+        let all = document.querySelectorAll("input.planInput")
         for (let i=0; i<all.length; i++){
           modified_inputs.delete(all[i])
+          all[i].style.color = 'black'
+          all[i].style.outline = '0px'
         }
       })
       $("#postAdditionalButton").click(function(){
-        modified_inputs.delete(document.querySelector("textarea.form-control.additionalTextarea"))
+        let textbox = document.querySelector("textarea.form-control.additionalTextarea")
+        modified_inputs.delete(textbox)
+        textbox.style.color = 'black'
       })
       $(".updateBreakdownButton").click(function(){
         let all = document.querySelectorAll(".Breakdown"+this.id)
         for (let i=0; i<all.length; i++){
           modified_inputs.delete(all[i])
+          all[i].style.color = 'black'
         }
       })
       // here goes create button
@@ -78,6 +156,7 @@ head
         let all = document.querySelectorAll('.'+data.tempId)
         for (let i=0; i<all.length; i++){
           modified_inputs.delete(all[i])
+          all[i].style.color = 'black'
         }
       });
  
@@ -358,7 +437,7 @@ head
 body
   header
     nav(class="navbar navbar-dark bg-gestampblue navbar-expand-lg")
-      a(href="/api/raport" class="navbar-brand")
+      a(href="/api/raport/create" class="navbar-brand")
         img(src="https://www.gestamp.com/Gestamp11/media/GestampFiles/Logo-Gestamp-(white)02.svg" height="30" class="d-inline-block align-bottom mr-4" alt="Gestamp ಠ_ಠ")
       button(class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu")
         span(class="navbar-toggler-icon")
@@ -453,7 +532,6 @@ body
                 // in the route when 'raport' is created, presence is not passed as an argument so it's undefined
                 // checks on length prevent iterations over empty list AND if the presence is not saved for the first time, basic form generates
 
-
                 if (raport.usersPresent.length != 0)
                   each user in raport.usersPresent
                     tr
@@ -462,7 +540,7 @@ body
                       td #{user.spec}
                       td
                         div(class='form-check') 
-                          input(class="form-check-input" type="checkbox" name=user._id value=1 id=user._id checked=true)
+                          input(class="form-check-input presenceInput" type="checkbox" name=user._id value=1 id=user._id checked=true)
                 if (raport.usersMissing.length != 0)
                   each user in raport.usersMissing
                     tr
@@ -471,7 +549,7 @@ body
                       td #{user.spec}
                       td
                         div(class='form-check') 
-                          input(class="form-check-input" type="checkbox" name=user._id value=1 id=user._id checked=false)
+                          input(class="form-check-input presenceInput" type="checkbox" name=user._id value=1 id=user._id checked=false)
 
 
             div.float-right
@@ -492,7 +570,7 @@ body
                       input(class="form-control placesInput" type="text" id=place[0] value=raport.inspection[place[0]])
                     td
                       div(class='form-check') 
-                        input(class="form-check-input" type="checkbox" id=place[1] value=1 checked=raport.inspection[place[1]])
+                        input(class="form-check-input placesInput" type="checkbox" id=place[1] value=1 checked=raport.inspection[place[1]])
             div.float-right
               button(class="btn btn-primary mb-2" type='button' id="postPlacesButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
 
@@ -515,7 +593,7 @@ body
                       // it's easier to add a non-numeric character at the begining of a class name
                     td
                       div(class='form-check') 
-                        input(class="form-check-input" class='_'+item._id type="checkbox" value=1 checked=item.isDone)
+                        input(class="form-check-input planInput" class='_'+item._id type="checkbox" value=1 checked=item.isDone)
 
 
             div.float-right
@@ -585,14 +663,14 @@ body
                         .row.mt-2
                           .col.d-flex.justify-content-between
                             .form-check.form-check-inline
-                              input#inlineRadio1.form-check-input.statusRepaired(type='radio' name='inlineRadioOptions' value='1' checked=(breakdown.status===1 ? true : false))
-                              label.form-check-label(for='inlineRadio1')  Naprawiono 
+                              input.form-check-input.statusRepaired(type='radio' id=('inlineRadio1'+breakdown._id) name='inlineRadioOptions' value='1' checked=(breakdown.status===1 ? true : false))
+                              label.form-check-label(for='inlineRadio1'+breakdown._id)  Naprawiono 
                             .form-check.form-check-inline
-                              input#inlineRadio2.form-check-input.statusNotRepaired(type='radio' name='inlineRadioOptions' value='2' checked=(breakdown.status===2 ? true : false))
-                              label.form-check-label(for='inlineRadio2')  Nie naprawiono 
+                              input.form-check-input.statusNotRepaired(type='radio' id=('inlineRadio2'+breakdown._id) name='inlineRadioOptions' value='2' checked=(breakdown.status===2 ? true : false))
+                              label.form-check-label(for='inlineRadio2'+breakdown._id)  Nie naprawiono 
                             .form-check.form-check-inline
-                              input#inlineRadio3.form-check-input.statusTemporary(type='radio' name='inlineRadioOptions' value='3' checked=(breakdown.status===3 ? true : false))
-                              label.form-check-label(for='inlineRadio3')  Rozwiązanie tymczasowe 
+                              input.form-check-input.statusTemporary(type='radio' id=('inlineRadio3'+breakdown._id) name='inlineRadioOptions' value='3' checked=(breakdown.status===3 ? true : false))
+                              label.form-check-label(for='inlineRadio3'+breakdown._id)  Rozwiązanie tymczasowe 
                         .row
                           .col.mt-3
                             | Uzyte części

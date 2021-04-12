@@ -35,7 +35,7 @@ exports.raport_list = function (req, res, next) {
     if (err) {
       return next(err)
     }
-    res.render('test', {
+    res.render('raport_list', {
       title: 'Lista Raportów',
       raport_list: list_raports,
     })
@@ -47,10 +47,15 @@ exports.raport_detail = function (req, res, next) {
   res.send('NOT IMPLEMENTED: raport detail get')
 }
 
+exports.raport_create = function (req, res, next) {
+  let today = new Date()
+  res.render('raport_pick', { today: today })
+}
+
 // Display raport create form on GET.
 exports.raport_create_get = function (req, res, next) {
   // read SHIFT NUM from logged user
-  let shift_num = 1
+  let shift_num = req.params.shift
   let today = new Date()
   let tomorrow = new Date()
   today.setHours(0, 0, 0, 0)
