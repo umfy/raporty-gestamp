@@ -8,11 +8,11 @@ block content
          div(class='col mr-5 d-flex justify-content-center') Otwórz dzisiejszy raport dla zmiany o numerze:
       div(class='row pb-5')
          div(class='col py-4 d-flex justify-content-center')
-            a(type="button" class="btn mx-1 btn-lg btn-block" class=(6 < today.getHours() && today.getHours() < 14 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/1") 
+            a(type="button" class="btn mx-1 btn-lg btn-block" class=(6 <= today.getHours() && today.getHours() < 14 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/1") 
                h2 1 
          div(class='col py-4 d-flex justify-content-center') 
-            a(type="button" class="btn mx-1btn-lg btn-block" class=( 14 < today.getHours() && today.getHours() < 22 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/2") 
+            a(type="button" class="btn mx-1btn-lg btn-block" class=( 14 <= today.getHours() && today.getHours() < 22 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/2") 
                h2 2
          div(class='col py-4 mr-5 d-flex justify-content-center')
-            a(type="button" class="btn mx-1 btn-lg btn-block" class=(22 < today.getHours() || today.getHours() < 6 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/3") 
+            a(type="button" class="btn mx-1 btn-lg btn-block" class=(22 <= today.getHours() || today.getHours() < 6 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/3") 
                h2 3
