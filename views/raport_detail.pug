@@ -9,7 +9,6 @@ block content
   div(class='col')
     div(class='row')
       div(class='col mr-4 mt-4')
-        a.float-right(href='/api/raport/'+ raport._id +'/pdf' id='downloadPDF') Pobierz w formacie PDF
         h1.mt-5.text-center #{raport.virtual_date} 
         h2.text-center Zmiana #{(raport.shift === 1 ? '1 – Poranna' : (raport.shift === 2? '2 – Popołudniowa' : '3 – Nocna'))}
         p.h4.my-4.text-center Dziennik zdarzeń oraz działania podjęte przez dział Utrzymania Ruchu
@@ -119,7 +118,12 @@ block content
                 td Prace na postój 
                 td #{breakdown.plannedAction}
 
-          
+      div(class="col-lg-2 my-5") 
+        a(href='/api/raport/'+ raport._id +'/download' target="_blank") Pobierz PDF
+        p
+        a(href=raport.url+'/delete') Usuń 
+        p
+        a(href='/api/raport/create/'+raport._id) Zmodyfikuj    
 
 
 

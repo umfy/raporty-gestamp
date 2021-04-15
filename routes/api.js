@@ -159,8 +159,8 @@ router.get('/raport/:id', raport_controller.raport_detail)
 // GET request for one raport item
 router.get('/raport/:id/pdf', raport_controller.raport_detail_pdf)
 
-// GET request for one raport item
-router.post('/raport/:id', raport_controller.raport_detail_post)
+// pdf download
+router.get('/raport/:id/download', raport_controller.raport_detail_download)
 
 /// SEARCH ROUTES ///
 

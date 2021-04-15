@@ -7,7 +7,8 @@ const Device = require('../models/device')
 const Inspection = require('../models/inspection')
 const Breakdown = require('../models/breakdown')
 const async = require('async')
-const pdf = require('../middleware/pdf')
+const path = require('path')
+const puppeteer = require('puppeteer')
 
 function createEmptyInspection() {
   let inspection = new Inspection({
@@ -124,14 +125,24 @@ exports.raport_detail_pdf = function (req, res, next) {
       })
     })
 }
-exports.raport_detail_post = function (req, res, next) {
-  console.log('kilk')
-  // let url = req.params.id
-  // const filename = await pdf(url, req)
-  // res.contentType('application/pdf')
-  // res.sendFile(path.join(__dirname, filename))
+exports.raport_detail_download = function (req, res, next) {
+  ;(async () => {
+    const browser = await puppeteer.launch()
+    const page = await browser.newPage()
+    await page.goto(
+      'http://localhost:3000/api/raport/' + req.params.id + '/pdf',
+      {
+        waitUntil: 'networkidle2',
+      }
+    )
+    await page.pdf({ path: 'raport.pdf', format: 'a4' })
+
+    await browser.close()
+    res.sendFile(path.join(__dirname, '../', 'raport.pdf'))
+  })()
 }
 
+// it's a hub
 exports.raport_create = function (req, res, next) {
   let raport1, raport2, raport3
   let today = new Date()
@@ -172,7 +183,6 @@ exports.raport_create = function (req, res, next) {
 
 // Display raport create form on GET.
 exports.raport_create_get = function (req, res, next) {
-  // read SHIFT NUM from logged user
   let shift_num = req.params.shift
   let today = new Date()
   let tomorrow = new Date()
@@ -186,121 +196,188 @@ exports.raport_create_get = function (req, res, next) {
     ['electric', 'isElectric', 'Rozdzielnia'],
     ['workshop', 'isWorkshop', 'Warsztat'],
   ]
-
-  // check if Report for this day and shift exists
-
-  async.parallel(
-    {
-      raport: function (callback) {
-        Raport.find({
-          date: {
-            $gte: today,
-            $lt: tomorrow,
-          },
-          shift: shift_num,
-        })
-          .populate('usersPresent')
-          .populate('usersMissing')
-          .populate('inspection')
-          .populate('plan')
-          .populate({
-            path: 'breakdown',
-            // populat nested array od ids
-            populate: { path: 'line' },
-          })
-          .populate({
-            path: 'breakdown',
-            // populat nested array od ids
-            populate: { path: 'devicetype' },
-          })
-          .populate({
-            path: 'breakdown',
-            // populat nested array od ids
-            populate: { path: 'device' },
-          })
-          .exec(callback)
-      },
-      line: function (callback) {
-        Line.find()
-          .sort([['name', 'ascending']])
-          .exec(callback)
-      },
-      devicetype: function (callback) {
-        Devicetype.find()
-          .sort([['name', 'ascending']])
-          .exec(callback)
-      },
-      device: function (callback) {
-        Device.find()
-          .sort([['name', 'ascending']])
-          .exec(callback)
-      },
-    },
-    function (err, theresult) {
-      if (err) {
-        return next(err)
-      }
-      if (Object.keys(theresult.raport).length == 0) {
-        // no reports found
-        // create new Report
-        inspection = createEmptyInspection()
-
-        async.parallel(
-          {
-            user: function (callback) {
-              User.find({ shift: shift_num }).exec(callback)
-            },
-            plan: function (callback) {
-              Plan.find({
-                date_execution: {
-                  $gte: today,
-                  $lt: tomorrow,
-                },
-                shift: shift_num,
-              }).exec(callback)
-            },
-          },
-          function (err, results) {
-            if (err) {
-              return next(err)
-            }
-            // Successful, so render.
-
-            let raport = new Raport({
-              date: new Date(),
-              shift: shift_num,
-              usersMissing: results.user,
-              usersPresent: [],
-              plan: results.plan,
-              inspection: inspection,
+  // modify raport route
+  if (
+    req.params.shift !== '1' &&
+    req.params.shift !== '2' &&
+    req.params.shift !== '3'
+  ) {
+    async.parallel(
+      {
+        raport: function (callback) {
+          Raport.findById(req.params.shift)
+            .populate('usersPresent')
+            .populate('usersMissing')
+            .populate('inspection')
+            .populate('plan')
+            .populate({
+              path: 'breakdown',
+              // populat nested array od ids
+              populate: { path: 'line' },
             })
-            console.log('raport: ', raport)
-            raport.save(function (err) {
-              if (err) {
-                return next(err)
-              }
-              res.render('raport_form', {
-                raport: raport,
-                inspectionPlaces: inspectionPlaces,
-                lineList: theresult.line,
-                devicetypeList: theresult.devicetype,
-                deviceList: theresult.device,
-              })
+            .populate({
+              path: 'breakdown',
+              // populat nested array od ids
+              populate: { path: 'devicetype' },
             })
-          }
-        )
-      } else {
-        // Report found
+            .populate({
+              path: 'breakdown',
+              // populat nested array od ids
+              populate: { path: 'device' },
+            })
+            .exec(callback)
+        },
+        line: function (callback) {
+          Line.find()
+            .sort([['name', 'ascending']])
+            .exec(callback)
+        },
+        devicetype: function (callback) {
+          Devicetype.find()
+            .sort([['name', 'ascending']])
+            .exec(callback)
+        },
+        device: function (callback) {
+          Device.find()
+            .sort([['name', 'ascending']])
+            .exec(callback)
+        },
+      },
+      function (err, theresult) {
+        if (err) {
+          return next(err)
+        }
+        if (theresult == null) {
+          var err = new Error('Raport not found')
+          err.status = 404
+          return next(err)
+        }
+        // success
         res.render('raport_form', {
-          raport: theresult.raport[0],
+          raport: theresult.raport,
           inspectionPlaces: inspectionPlaces,
           lineList: theresult.line,
           devicetypeList: theresult.devicetype,
           deviceList: theresult.device,
         })
       }
-    }
-  )
+    )
+  } else {
+    // check if Report for this day and shift exists
+
+    async.parallel(
+      {
+        raport: function (callback) {
+          Raport.find({
+            date: {
+              $gte: today,
+              $lt: tomorrow,
+            },
+            shift: shift_num,
+          })
+            .populate('usersPresent')
+            .populate('usersMissing')
+            .populate('inspection')
+            .populate('plan')
+            .populate({
+              path: 'breakdown',
+              // populat nested array od ids
+              populate: { path: 'line' },
+            })
+            .populate({
+              path: 'breakdown',
+              // populat nested array od ids
+              populate: { path: 'devicetype' },
+            })
+            .populate({
+              path: 'breakdown',
+              // populat nested array od ids
+              populate: { path: 'device' },
+            })
+            .exec(callback)
+        },
+        line: function (callback) {
+          Line.find()
+            .sort([['name', 'ascending']])
+            .exec(callback)
+        },
+        devicetype: function (callback) {
+          Devicetype.find()
+            .sort([['name', 'ascending']])
+            .exec(callback)
+        },
+        device: function (callback) {
+          Device.find()
+            .sort([['name', 'ascending']])
+            .exec(callback)
+        },
+      },
+      function (err, theresult) {
+        if (err) {
+          return next(err)
+        }
+        if (Object.keys(theresult.raport).length == 0) {
+          // no reports found
+          // create new Report
+          inspection = createEmptyInspection()
+
+          async.parallel(
+            {
+              user: function (callback) {
+                User.find({ shift: shift_num }).exec(callback)
+              },
+              plan: function (callback) {
+                Plan.find({
+                  date_execution: {
+                    $gte: today,
+                    $lt: tomorrow,
+                  },
+                  shift: shift_num,
+                }).exec(callback)
+              },
+            },
+            function (err, results) {
+              if (err) {
+                return next(err)
+              }
+              // Successful, so render.
+
+              let raport = new Raport({
+                date: new Date(),
+                shift: shift_num,
+                usersMissing: results.user,
+                usersPresent: [],
+                plan: results.plan,
+                inspection: inspection,
+              })
+              console.log('raport: ', raport)
+              raport.save(function (err) {
+                if (err) {
+                  return next(err)
+                }
+                res.render('raport_form', {
+                  raport: raport,
+                  inspectionPlaces: inspectionPlaces,
+                  lineList: theresult.line,
+                  devicetypeList: theresult.devicetype,
+                  deviceList: theresult.device,
+                })
+              })
+            }
+          )
+        } else {
+          // Report found
+          res.render('raport_form', {
+            raport: theresult.raport[0],
+            inspectionPlaces: inspectionPlaces,
+            lineList: theresult.line,
+            devicetypeList: theresult.devicetype,
+            deviceList: theresult.device,
+          })
+        }
+      }
+    )
+  }
 }
 
 exports.raport_create_post = function (req, res, next) {
@@ -399,12 +476,28 @@ exports.raport_create_post = function (req, res, next) {
 }
 // Display raport delete form on GET.
 exports.raport_delete_get = function (req, res) {
-  res.send('NOT IMPLEMENTED: raport delete GET')
+  Raport.findById(req.params.id).exec(function (err, raport) {
+    if (err) {
+      return next(err)
+    }
+    if (raport == null) {
+      let err = new Error('Nie znaleziono takiego raportu')
+      err.status = 404
+      return next(err)
+    }
+    res.render('raport_delete.pug', { raport: raport })
+  })
 }
 
 // Handle raport delete on POST.
 exports.raport_delete_post = function (req, res) {
-  res.send('NOT IMPLEMENTED: raport delete POST')
+  Raport.findByIdAndRemove(req.body.raportId, function (err) {
+    if (err) {
+      return next(err)
+    }
+    // Success - go to author list
+    res.redirect('/api/raport')
+  })
 }
 
 // Display raport update form on GET.

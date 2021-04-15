@@ -1,132 +1,133 @@
 doctype html
 html(lang='en')
 head
-  title= title
-  meta(charset='utf-8')
-  meta(name='viewport', content='width=device-width, initial-scale=1')
-  link(rel="shortcut icon" type="image/jpg" href="/images/favicon.ico")
-  link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css", integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z", crossorigin="anonymous")
-  link(rel='stylesheet', href='/stylesheets/style.css')
-  link(href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;subset=latin-ext" rel="stylesheet")
+   title= title
+   meta(charset='utf-8')
+   meta(name='viewport', content='width=device-width, initial-scale=1')
+   link(rel="shortcut icon" type="image/jpg" href="/images/favicon.ico")
+   link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css", integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z", crossorigin="anonymous")
+   link(rel='stylesheet', href='/stylesheets/style.css')
+   link(href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;subset=latin-ext" rel="stylesheet")
 
-  script(src="https://code.jquery.com/jquery-3.5.1.min.js")
-  script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous")
-    // Always remember to call the above files first before calling the bootstrap.min.js file
-  script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous")
+   script(src="https://code.jquery.com/jquery-3.5.1.min.js")
+   script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous")
+      // Always remember to call the above files first before calling the bootstrap.min.js file
+   script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous")
 body
-  div(class='col')
-    div(class='row')
-      div(class='col mr-4 mt-4')
-        h1.mt-5.text-center #{raport.virtual_date} 
-        h2.text-center Zmiana #{(raport.shift === 1 ? '1 – Poranna' : (raport.shift === 2? '2 – Popołudniowa' : '3 – Nocna'))}
-        p.h4.my-4.text-center Dziennik zdarzeń oraz działania podjęte przez dział Utrzymania Ruchu
+   div(class='col')
+      div(class='row')
+         div(class='col')
+            div.page.mt-4
+               img.gestamp-logo.float-left(src="/images/Gestamp_Logo.png" alt="")
+               h1.text-center.umfy-right-margin200 #{raport.virtual_date} 
+               h2.text-center Zmiana #{(raport.shift === 1 ? '1 – Poranna' : (raport.shift === 2? '2 – Popołudniowa' : '3 – Nocna'))}
+               p.h4.mt-4.text-center Dziennik zdarzeń oraz działania podjęte przez dział Utrzymania Ruchu
+            div.page
+               table(class='table table-bordered')
+                  caption Skład zmiany
+                     thead
+                        tr
+                           th(scope="col") Imię
+                           th(scope="col") Nazwisko
+                           th(scope="col") Specjalizacja
+                           th.umfy-table-width100(scope="col") Obecność
+                     tbody
+                        if (raport.usersPresent.length != 0)
+                           each user in raport.usersPresent
+                              tr
+                                 td #{user.name}
+                                 td #{user.surname}
+                                 td #{user.spec}
+                                 td
+                                    button.btn.btn-success.umfy-btn(disabled) OK                
+                        if (raport.usersMissing.length != 0)
+                           each user in raport.usersMissing
+                              tr
+                                 td #{user.name}
+                                 td #{user.surname}
+                                 td #{user.spec}
+                                 td
+                                    button.btn.btn-danger.umfy-btn(disabled) NOK
+            div.page
+               table(class="table table-bordered") 
+                  caption Obchód
+                  thead 
+                     tr 
+                        th.umfy-table-width400(scope="col") Miejsce
+                        th(scope="col") Komentarz
+                        th.umfy-table-width100( scope="col") Stan
+                  tbody
+                     each place in inspectionPlaces
+                        tr
+                           td #{place[2]}
+                           td #{raport.inspection[place[0]]}
+                           td 
+                              button.btn.umfy-btn(class=(raport.inspection[place[1]] === true ? 'btn-success' : 'btn-danger') disabled) #{(raport.inspection[place[1]] === true ? 'OK ' : 'NOK')}
 
-        table(class='table table-bordered')
-          caption Skład zmiany
-            thead
-              tr
-                th(scope="col") Imię
-                th(scope="col") Nazwisko
-                th(scope="col") Specjalizacja
-                th.umfy-table-width100(scope="col") Obecność
-            tbody
-              // in the route when 'raport' is created, presence is not passed as an argument so it's undefined
-              // checks on length prevent iterations over empty list AND if the presence is not saved for the first time, basic form generates
-              if (raport.usersPresent.length != 0)
-                each user in raport.usersPresent
-                  tr
-                    td #{user.name}
-                    td #{user.surname}
-                    td #{user.spec}
-                    td
-                      button.btn.btn-success.umfy-btn(disabled) OK                
-              if (raport.usersMissing.length != 0)
-                each user in raport.usersMissing
-                  tr
-                    td #{user.name}
-                    td #{user.surname}
-                    td #{user.spec}
-                    td
-                      button.btn.btn-danger.umfy-btn(disabled) NOK
+            div.page
+               table(class='table table-bordered') 
+                  caption Prace Planowane
+                  thead 
+                     tr
+                        th(scope="col") Opis
+                        th(scope="col") Komentarz
+                        th.umfy-table-width100(scope="col") Stan
+                  tbody
+                     each item in raport.plan
+                        tr
+                           td #{item.desc}
+                           td #{item.comments}
+                           td 
+                              button.btn.umfy-btn(class=(item.isDone === true ? 'btn-success' : 'btn-danger') disabled) #{(item.isDone=== true ? 'OK ' : 'NOK')}
 
-        table(class="table table-bordered") 
-          caption Obchód
-          thead 
-            tr 
-              th.umfy-table-width400(scope="col") Miejsce
-              th(scope="col") Komentarz
-              th.umfy-table-width100( scope="col") Stan
-          tbody
-            each place in inspectionPlaces
-              tr
-                td #{place[2]}
-                td #{raport.inspection[place[0]]}
-                td 
-                  button.btn.umfy-btn(class=(raport.inspection[place[1]] === true ? 'btn-success' : 'btn-danger') disabled) #{(raport.inspection[place[1]] === true ? 'OK ' : 'NOK')}
-        
-        
-        table(class='table table-bordered') 
-          caption Prace Planowane
-          thead 
-            tr
-              th(scope="col") Opis
-              th(scope="col") Komentarz
-              th.umfy-table-width100(scope="col") Stan
-          tbody
-            each item in raport.plan
-              tr
-                td #{item.desc}
-                td #{item.comments}
-                td 
-                  button.btn.umfy-btn(class=(item.isDone === true ? 'btn-success' : 'btn-danger') disabled) #{(item.isDone=== true ? 'OK ' : 'NOK')}
+            div.page
+               table(class='table table-bordered')
+                  caption Dodatkowe informacje
+                  tbody
+                     td.p-1.pb-5 #{raport.additional}
 
 
-        table(class='table table-bordered')
-          caption Dodatkowe informacje
-          tbody
-            td.p-1.pb-5 #{raport.additional}
+            each breakdown in raport.breakdown
+               div.page
+                  table(class='table table-bordered')
+                     caption.h5 Awaria #{(breakdown._id)}
+                     thead
+                        tr(class=(breakdown.status === 1 ? 'table-success' : (breakdown.status === 2 ? 'table-danger' : 'table-warning')))
+                           th.umfy-table-width400(class='text-center' scope='col') Status:
+                           th.text-center(scope='col') #{(breakdown.status === 1 ? 'Naprawiono' : (breakdown.status === 2 ? 'Nie naprawiono' : 'Działanie Tymczasowe'))}
+                     tbody
+                        tr.umfy-table-separator
+                           td Czas trwania awarii: 
+                           td #{breakdown.full_duration}
+                        tr
+                           td Linia 
+                           td #{breakdown.line.name}
+                        tr
+                           td Typ
+                           td #{breakdown.devicetype.name}
+                        tr.umfy-table-separator
+                           td Urządzenie
+                           td #{breakdown.device.name}
+                        tr
+                           td Diagnostyka 
+                           td #{breakdown.diagnostics}
+                        tr.umfy-table-separator
+                           td Działanie 
+                           td #{breakdown.treatment}
+                        tr
+                           td Numer zlecenia 
+                           td #{breakdown.orderNumber}
+                        tr
+                           td Użyte części
+                           td #{breakdown.partsUsed}
+                        tr
+                           td Części do zamówienia 
+                           td #{breakdown.partsToOrder}
+                        tr.umfy-table-separator
+                           td Prace na postój 
+                           td #{breakdown.plannedAction}
 
 
-        each breakdown in raport.breakdown
-          table(class='my-5 table table-bordered')
-            caption.h5 Awaria #{(breakdown._id)}
-            thead
-              tr(class=(breakdown.status === 1 ? 'table-success' : (breakdown.status === 2 ? 'table-danger' : 'table-warning')))
-                th.umfy-table-width400(class='text-center' scope='col') Status:
-                th.text-center(scope='col') #{(breakdown.status === 1 ? 'Naprawiono' : (breakdown.status === 2 ? 'Nie naprawiono' : 'Działanie Tymczasowe'))}
-            tbody
-              tr.umfy-table-separator
-                td Czas trwania awarii: 
-                td #{breakdown.full_duration}
-              tr
-                td Linia 
-                td #{breakdown.line.name}
-              tr
-                td Typ
-                td #{breakdown.devicetype.name}
-              tr.umfy-table-separator
-                td Urządzenie
-                td #{breakdown.device.name}
-              tr
-                td Diagnostyka 
-                td #{breakdown.diagnostics}
-              tr.umfy-table-separator
-                td Działanie 
-                td #{breakdown.treatment}
-              tr
-                td Numer zlecenia 
-                td #{breakdown.orderNumber}
-              tr
-                td Użyte części
-                td #{breakdown.partsUsed}
-              tr
-                td Części do zamówienia 
-                td #{breakdown.partsToOrder}
-              tr.umfy-table-separator
-                td Prace na postój 
-                td #{breakdown.plannedAction}
-
-          
 
 
 
