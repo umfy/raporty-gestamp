@@ -22,15 +22,29 @@ body {
   text-align: center;
 }
 
-.table td {
+.table-umfy td {
   padding: 0.2rem;
 }
-.table th {
+.table-umfy th {
   padding: 0.2rem;
 }
 
 .umfy-ghost-table {
   margin: 0px;
+}
+.umfy-table-separator {
+  border-bottom: 2px solid rgb(200, 200, 200) !important;
+}
+
+.umfy-table-width100 {
+  width: 100px;
+}
+
+.umfy-table-width400 {
+  width: 12rem;
+}
+.umfy-btn {
+  width: 70px;
 }
 
 input[type='time'] {

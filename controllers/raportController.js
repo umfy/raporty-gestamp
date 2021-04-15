@@ -7,6 +7,7 @@ const Device = require('../models/device')
 const Inspection = require('../models/inspection')
 const Breakdown = require('../models/breakdown')
 const async = require('async')
+const pdf = require('../middleware/pdf')
 
 function createEmptyInspection() {
   let inspection = new Inspection({
@@ -44,12 +45,129 @@ exports.raport_list = function (req, res, next) {
 
 // Display detail page for a specific raport.
 exports.raport_detail = function (req, res, next) {
-  res.send('NOT IMPLEMENTED: raport detail get')
+  let inspectionPlaces = [
+    ['kettle', 'isKettle', 'Kotłownia'],
+    ['compressor', 'isCompressor', 'Kompresownia'],
+    ['ice', 'isIce', 'Wieża Chłodu'],
+    ['electric', 'isElectric', 'Rozdzielnia'],
+    ['workshop', 'isWorkshop', 'Warsztat'],
+  ]
+  Raport.findById(req.params.id)
+    .populate('usersPresent')
+    .populate('usersMissing')
+    .populate('inspection')
+    .populate('plan')
+    .populate({
+      path: 'breakdown',
+      populate: { path: 'line' },
+    })
+    .populate({
+      path: 'breakdown',
+      populate: { path: 'devicetype' },
+    })
+    .populate({
+      path: 'breakdown',
+      populate: { path: 'device' },
+    })
+    .exec(function (err, raport) {
+      if (err) {
+        return next(err)
+      }
+      if (raport == null) {
+        let err = new Error('Nie znaleziono takiego raportu')
+        err.status = 404
+        return next(err)
+      }
+      res.render('raport_detail', {
+        raport: raport,
+        inspectionPlaces: inspectionPlaces,
+      })
+    })
+}
+exports.raport_detail_pdf = function (req, res, next) {
+  let inspectionPlaces = [
+    ['kettle', 'isKettle', 'Kotłownia'],
+    ['compressor', 'isCompressor', 'Kompresownia'],
+    ['ice', 'isIce', 'Wieża Chłodu'],
+    ['electric', 'isElectric', 'Rozdzielnia'],
+    ['workshop', 'isWorkshop', 'Warsztat'],
+  ]
+  Raport.findById(req.params.id)
+    .populate('usersPresent')
+    .populate('usersMissing')
+    .populate('inspection')
+    .populate('plan')
+    .populate({
+      path: 'breakdown',
+      populate: { path: 'line' },
+    })
+    .populate({
+      path: 'breakdown',
+      populate: { path: 'devicetype' },
+    })
+    .populate({
+      path: 'breakdown',
+      populate: { path: 'device' },
+    })
+    .exec(function (err, raport) {
+      if (err) {
+        return next(err)
+      }
+      if (raport == null) {
+        let err = new Error('Nie znaleziono takiego raportu')
+        err.status = 404
+        return next(err)
+      }
+      res.render('raport_pdf', {
+        raport: raport,
+        inspectionPlaces: inspectionPlaces,
+      })
+    })
+}
+exports.raport_detail_post = function (req, res, next) {
+  console.log('kilk')
+  // let url = req.params.id
+  // const filename = await pdf(url, req)
+  // res.contentType('application/pdf')
+  // res.sendFile(path.join(__dirname, filename))
 }
 
 exports.raport_create = function (req, res, next) {
+  let raport1, raport2, raport3
   let today = new Date()
-  res.render('raport_pick', { today: today })
+  let tomorrow = new Date()
+  today.setHours(0, 0, 0, 0)
+  tomorrow.setHours(24, 0, 0, 0)
+  Raport.find(
+    {
+      date: {
+        $gte: today,
+        $lt: tomorrow,
+      },
+    },
+    ['_id', 'shift']
+  ).exec(function (err, list_raports) {
+    if (err) {
+      return next(err)
+    }
+    for (let i = 0; i < list_raports.length; i++) {
+      if (list_raports[i].shift === 1) {
+        raport1 = list_raports[i]._id
+      }
+      if (list_raports[i].shift === 2) {
+        raport2 = list_raports[i]._id
+      }
+      if (list_raports[i].shift === 3) {
+        raport3 = list_raports[i]._id
+      }
+    }
+    res.render('raport_pick', {
+      today: new Date(),
+      raport1: raport1,
+      raport2: raport2,
+      raport3: raport3,
+    })
+  })
 }
 
 // Display raport create form on GET.

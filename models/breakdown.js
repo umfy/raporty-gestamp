@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { DateTime } = require('luxon')
 
 const Schema = mongoose.Schema
 
@@ -20,6 +21,14 @@ const BreakdownSchema = new Schema({
 // Virtual for user's URL
 BreakdownSchema.virtual('url').get(function () {
   return '/api/breakdown/' + this._id
+})
+
+BreakdownSchema.virtual('full_duration').get(function () {
+  return (
+    DateTime.fromJSDate(this.dateBegin).toFormat('HH:mm') +
+    '  —   ' +
+    DateTime.fromJSDate(this.dateEnd).toFormat(' HH:mm')
+  )
 })
 
 //Export model

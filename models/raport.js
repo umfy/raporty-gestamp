@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { DateTime } = require('luxon')
 
 const Schema = mongoose.Schema
 
@@ -20,6 +21,10 @@ const RaportSchema = new Schema({
 // Virtual for Raport's URL
 RaportSchema.virtual('url').get(function () {
   return '/api/raport/' + this._id
+})
+
+RaportSchema.virtual('virtual_date').get(function () {
+  return DateTime.fromJSDate(this.date).toFormat('dd.LL.yyyy')
 })
 
 //Export model
