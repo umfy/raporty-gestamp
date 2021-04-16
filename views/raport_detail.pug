@@ -20,7 +20,7 @@ block content
                 th(scope="col") Imię
                 th(scope="col") Nazwisko
                 th(scope="col") Specjalizacja
-                th.umfy-table-width100(scope="col") Obecność
+                th(width="13%" scope="col") Obecność
             tbody
               // in the route when 'raport' is created, presence is not passed as an argument so it's undefined
               // checks on length prevent iterations over empty list AND if the presence is not saved for the first time, basic form generates
@@ -31,7 +31,7 @@ block content
                     td #{user.surname}
                     td #{user.spec}
                     td
-                      button.btn.btn-success.umfy-btn(disabled) OK                
+                      button.btn.btn-success.umfy-btn(disabled) TAK                
               if (raport.usersMissing.length != 0)
                 each user in raport.usersMissing
                   tr
@@ -39,15 +39,15 @@ block content
                     td #{user.surname}
                     td #{user.spec}
                     td
-                      button.btn.btn-danger.umfy-btn(disabled) NOK
+                      button.btn.btn-danger.umfy-btn(disabled) NIE
 
         table(class="table table-bordered") 
           caption Obchód
           thead 
             tr 
-              th.umfy-table-width400(scope="col") Miejsce
+              th(width="20%" scope="col") Miejsce
               th(scope="col") Komentarz
-              th.umfy-table-width100( scope="col") Stan
+              th(width="13%" scope="col") Stan
           tbody
             each place in inspectionPlaces
               tr
@@ -63,7 +63,7 @@ block content
             tr
               th(scope="col") Opis
               th(scope="col") Komentarz
-              th.umfy-table-width100(scope="col") Stan
+              th(width="13%" scope="col") Stan
           tbody
             each item in raport.plan
               tr
@@ -84,7 +84,7 @@ block content
             caption.h5 Awaria #{(breakdown._id)}
             thead
               tr(class=(breakdown.status === 1 ? 'table-success' : (breakdown.status === 2 ? 'table-danger' : 'table-warning')))
-                th.umfy-table-width400(class='text-center' scope='col') Status:
+                th(width="20%" class='text-center' scope='col') Status:
                 th.text-center(scope='col') #{(breakdown.status === 1 ? 'Naprawiono' : (breakdown.status === 2 ? 'Nie naprawiono' : 'Działanie Tymczasowe'))}
             tbody
               tr.umfy-table-separator

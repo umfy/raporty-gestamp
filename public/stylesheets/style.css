@@ -36,15 +36,8 @@ body {
   border-bottom: 2px solid rgb(200, 200, 200) !important;
 }
 
-.umfy-table-width100 {
-  width: 100px;
-}
-
-.umfy-table-width400 {
-  width: 12rem;
-}
 .umfy-btn {
-  width: 70px;
+  width: 85px;
 }
 
 input[type='time'] {
@@ -76,4 +69,29 @@ input[type='time'] {
 }
 .umfy-right-margin200 {
   margin-top: 50px;
+}
+
+.padding0 {
+  padding: 0 !important;
+}
+.padding0 a {
+  display: block;
+  padding: 10px;
+}
+
+.dark-header-hover > thead > tr:hover {
+  background-color: #343a40; /* Assuming you want the hover color to be white */
+}
+
+a.black-link {
+  color: black;
+  text-decoration: none;
+}
+a.red-link {
+  color: #dc3545;
+  text-decoration: none;
+}
+a.green-link {
+  color: #28a745;
+  text-decoration: none;
 }

@@ -196,7 +196,7 @@ exports.raport_create_get = function (req, res, next) {
     ['electric', 'isElectric', 'Rozdzielnia'],
     ['workshop', 'isWorkshop', 'Warsztat'],
   ]
-  // modify raport route
+  // modify raport route -- works when valid _id is passed in request url
   if (
     req.params.shift !== '1' &&
     req.params.shift !== '2' &&

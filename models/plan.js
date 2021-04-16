@@ -31,5 +31,12 @@ PlanSchema.virtual('url').get(function () {
   return '/api/plan/' + this._id
 })
 
+PlanSchema.virtual('virtual_date_created').get(function () {
+  return DateTime.fromJSDate(this.date_created).toFormat('dd.LL.yyyy')
+})
+PlanSchema.virtual('virtual_date_execution').get(function () {
+  return DateTime.fromJSDate(this.date_execution).toFormat('dd.LL.yyyy')
+})
+
 //Export model
 module.exports = mongoose.model('Plan', PlanSchema)

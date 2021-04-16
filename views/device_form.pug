@@ -30,7 +30,7 @@ block content
               option(value=devicetype._id) #{devicetype.name}
       div.form-group
         label(for='desc') Opis:
-        textarea#desc.form-control(type='textarea', placeholder='Opis' name='desc') #{undefined===book ? '' : book.desc}
+        textarea#desc.form-control(type='textarea', placeholder='Opis' name='desc') #{undefined===device ? '' : device.desc}
       button.btn.btn-primary(type='submit') Submit
 
     if errors

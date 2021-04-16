@@ -9,17 +9,28 @@ head
   link(rel='stylesheet', href='/stylesheets/style.css')
   link(href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;subset=latin-ext" rel="stylesheet")
 
-  script(src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous")
+  script(src="https://code.jquery.com/jquery-3.5.1.min.js")
   script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous")
     // Always remember to call the above files first before calling the bootstrap.min.js file
   script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous")
 
   script.
-    // explicit variables' declaration
-    var transferedUsers = [];
-    var shift_picked = 0;
+    // enable popovers
+    $(document).ready(function(){
+      $(function () {
+        $('[data-toggle="popover"]').popover()
+      })
+    })
+  script.
+    $(document).ready(function(){
+      $("#postTransfered").click(function(){
+        $.post("", {transfered: JSON.stringify(transferedUsers)})
+      })
+    })
 
   script.
+    var transferedUsers = [];
+    var shift_picked = 0;
     function del(this_cell){
 
       if (shift_picked == 0){
@@ -53,47 +64,40 @@ head
       }
       $(this_cell).parents("tr").remove();
     }
-  script.
-    function activate(picked){
-      shift_picked = picked;
-      if (picked === 0) {
-        document.getElementById('zeroButton').style.color = 'green'
-        document.getElementById('oneButton').style.color = 'black'
-        document.getElementById('twoButton').style.color = 'black'
-        document.getElementById('threeButton').style.color = 'black'
-      }
-      if (picked === 1) {
-        document.getElementById('zeroButton').style.color = 'white'
-        document.getElementById('oneButton').style.color = 'green'
-        document.getElementById('twoButton').style.color = 'black'
-        document.getElementById('threeButton').style.color = 'black'
-      }
-      if (picked === 2)  {
-        document.getElementById('zeroButton').style.color = 'white'
-        document.getElementById('oneButton').style.color = 'black'
-        document.getElementById('twoButton').style.color = 'green'
-        document.getElementById('threeButton').style.color = 'black'
-      }
-      if (picked === 3) {
-        document.getElementById('zeroButton').style.color = 'white'
-        document.getElementById('oneButton').style.color = 'black'
-        document.getElementById('twoButton').style.color = 'black'
-        document.getElementById('threeButton').style.color = 'green'
-      }
 
-    }
   script.
-    $(function(){
-      $('form').submit(function(){
-          // when 'submit' button is pressed, fill the value of id='transfered' and then send
-          document.getElementById('transfered').value = JSON.stringify(transferedUsers)
-          //alert('This happened before submit. Clicking OK will proceed.');
-      });
-    });
-  script.
-    function moveup(){
-      console.log('not implemented... yet')
-    }
+    $(document).ready(function(){
+      $("#zeroButton").click(function(){
+        shift_picked = 0
+        document.getElementById('zeroButton').style.color = 'lime'
+        document.getElementById('oneButton').style.color = 'white'
+        document.getElementById('twoButton').style.color = 'white'
+        document.getElementById('threeButton').style.color = 'white'
+      })
+      $("#oneButton").click(function(){
+        shift_picked = 1
+        document.getElementById('zeroButton').style.color = 'white'
+        document.getElementById('oneButton').style.color = 'lime'
+        document.getElementById('twoButton').style.color = 'white'
+        document.getElementById('threeButton').style.color = 'white'
+      })
+      $("#twoButton").click(function(){
+        shift_picked = 2
+        document.getElementById('zeroButton').style.color = 'white'
+        document.getElementById('oneButton').style.color = 'white'
+        document.getElementById('twoButton').style.color = 'lime'
+        document.getElementById('threeButton').style.color = 'white'
+      })
+      $("#threeButton").click(function(){
+        shift_picked = 3
+        document.getElementById('zeroButton').style.color = 'white'
+        document.getElementById('oneButton').style.color = 'white'
+        document.getElementById('twoButton').style.color = 'white'
+        document.getElementById('threeButton').style.color = 'lime'
+      })
+    
+     })
+
   
 body
   header
@@ -183,13 +187,13 @@ body
 
           div(class="col-lg-6 my-4")
             table(class="table table-bordered p-1" id="zeroTable")
-              a(class="btn btn-primary btn-block" type="button" onclick="activate(0)" id="zeroButton") Pracownicy
+              a(class="btn btn-dark btn-block" type="button" id="zeroButton" style="color:lime") Pracownicy
               thead
                 tr
                   th(scope="col") Imię
                   th(scope="col") Nazwisko
                   th(scope="col") Specjalizacja
-                  th(scope="col") -
+                  th.text-center(scope="col") -
               tbody
                 each user in user_list
                   if user.shift === 0
@@ -201,15 +205,19 @@ body
                         button(class="btn btn-danger" type='button' value=user._id onclick="del(this)") -
 
 
+            p.mt-5.text-secondary Zaznacz nagłówek do którego chcesz przenosić elementy.
+            p.text-secondary Po wybraniu elementu, zostanie on przeniesiony do aktywnego nagłówka.
+
+
           div(class="col-lg-6 my-4")
             table(class="table table-bordered  p-1" id="oneTable")
-              a(class="btn btn-warning btn-block" type="button" onclick="activate(1)" id="oneButton") Poranna
+              a(class="btn btn-dark btn-block" type="button" id="oneButton") Poranna
               thead
                 tr
                   th(scope="col") Imię
                   th(scope="col") Nazwisko
                   th(scope="col") Specjalizacja
-                  th(scope="col") -
+                  th.text-center(scope="col") -
               tbody
                 each user in user_list
                   if user.shift === 1 
@@ -221,13 +229,13 @@ body
                         button(class="btn btn-danger" type='button' value=user._id onclick="del(this)") -
 
             table(class="table table-bordered  p-1" id="twoTable")
-              a(class="btn btn-warning btn-block" type="button" onclick="activate(2)" id="twoButton") Popołudniowa
+              a(class="btn btn-dark btn-block" type="button" id="twoButton") Popołudniowa
               thead
                 tr
                   th(scope="col") Imię
                   th(scope="col") Nazwisko
                   th(scope="col") Specjalizacja
-                  th(scope="col") -
+                  th.text-center(scope="col") -
               tbody
                 each user in user_list
                   if user.shift === 2 
@@ -239,13 +247,13 @@ body
                         button(class="btn btn-danger" type='button' value=user._id onclick="del(this)") -
 
             table(class="table table-bordered p-1 " id="threeTable")
-              a(class="btn btn-warning btn-block" type="button" onclick="activate(3)" id="threeButton") Nocna
+              a(class="btn btn-dark btn-block" type="button" id="threeButton") Nocna
               thead
                 tr
                   th(scope="col") Imię
                   th(scope="col") Nazwisko
                   th(scope="col") Specjalizacja
-                  th(scope="col") -
+                  th.text-center(scope="col") -
               tbody
                 each user in user_list
                   if user.shift === 3 
@@ -256,14 +264,11 @@ body
                       td
                         button(class="btn btn-danger" type='button' value=user._id onclick="del(this)") -
 
-          div(class='col-sm-2')
-            form(method='POST' action='')
-              div.form-group
-                input.form-control(id='transfered' type='hidden' name='transfered' value='')
-              button.btn.btn-primary.align-self-end(type='submit') Zapisz
+          div(class='col-sm-2 mb-5')
+            button.btn.btn-primary.align-self-end(type='button' id='postTransfered' data-toggle="popover" data-placement="right" data-trigger="focus" data-content="Zapisano!") Zapisz
           
-          div(class='col-sm-2 align-self-end')
-            button.btn.btn-secondary.align-self-end(type='button' onclick='moveup()') Do góry
+          //- div(class='col-sm-2 mb-5 align-self-end')
+          //-   button.btn.btn-secondary.align-self-end(type='button' onclick='moveup()') Do góry
 
           if errors
             ul

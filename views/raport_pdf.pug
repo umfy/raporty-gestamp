@@ -30,7 +30,7 @@ body
                            th(scope="col") Imię
                            th(scope="col") Nazwisko
                            th(scope="col") Specjalizacja
-                           th.umfy-table-width100(scope="col") Obecność
+                           th(width="13%" scope="col") Obecność
                      tbody
                         if (raport.usersPresent.length != 0)
                            each user in raport.usersPresent
@@ -39,7 +39,7 @@ body
                                  td #{user.surname}
                                  td #{user.spec}
                                  td
-                                    button.btn.btn-success.umfy-btn(disabled) OK                
+                                    button.btn.btn-success.umfy-btn(disabled) TAK               
                         if (raport.usersMissing.length != 0)
                            each user in raport.usersMissing
                               tr
@@ -47,15 +47,15 @@ body
                                  td #{user.surname}
                                  td #{user.spec}
                                  td
-                                    button.btn.btn-danger.umfy-btn(disabled) NOK
+                                    button.btn.btn-danger.umfy-btn(disabled) NIE
             div.page
                table(class="table table-bordered") 
                   caption Obchód
                   thead 
                      tr 
-                        th.umfy-table-width400(scope="col") Miejsce
+                        th(width="20%" scope="col") Miejsce
                         th(scope="col") Komentarz
-                        th.umfy-table-width100( scope="col") Stan
+                        th(width="13%" scope="col") Stan
                   tbody
                      each place in inspectionPlaces
                         tr
@@ -71,7 +71,7 @@ body
                      tr
                         th(scope="col") Opis
                         th(scope="col") Komentarz
-                        th.umfy-table-width100(scope="col") Stan
+                        th(width="13%" scope="col") Stan
                   tbody
                      each item in raport.plan
                         tr
@@ -93,7 +93,7 @@ body
                      caption.h5 Awaria #{(breakdown._id)}
                      thead
                         tr(class=(breakdown.status === 1 ? 'table-success' : (breakdown.status === 2 ? 'table-danger' : 'table-warning')))
-                           th.umfy-table-width400(class='text-center' scope='col') Status:
+                           th(width="20%" class='text-center' scope='col') Status:
                            th.text-center(scope='col') #{(breakdown.status === 1 ? 'Naprawiono' : (breakdown.status === 2 ? 'Nie naprawiono' : 'Działanie Tymczasowe'))}
                      tbody
                         tr.umfy-table-separator

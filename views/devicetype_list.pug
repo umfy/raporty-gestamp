@@ -2,14 +2,19 @@ extends layout
 
 block content
    div(class="col-sm-7 my-5")
-      h1= title
+      h1.text-center.mb-5= title
 
-      ul 
-         each devicetype in devicetype_list
-            li
-               a(href=devicetype.url) #{devicetype.name}
-         else
-            li Brak typów urządzeń.
+      table.table.table-bordered.table-striped.table-hover.dark-header-hover
+         thead.table-dark
+            tr
+               th.text-center Lista
+         tbody
+            each devicetype in devicetype_list
+               tr
+                  td.padding0
+                     a.black-link(href=devicetype.url) #{devicetype.name}
+            else
+               li Brak typów urządzeń.
    
    div(class="col-lg-2 my-5")
       a(href="/api/devicetype/create") Utwórz Typ Urządzenia

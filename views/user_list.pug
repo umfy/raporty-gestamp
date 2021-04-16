@@ -2,14 +2,25 @@ extends layout
 
 block content
    div(class="col-sm-7 my-5")
-      h1= title
+      h1.text-center.mb-5= title
 
-      ul 
-         each user in user_list
-            li
-               a(href=user.url) #{user.fullname}
-         else
-            li There are no users.
+      table.table.table-bordered.table-striped.table-hover.dark-header-hover
+         thead.table-dark
+            tr
+               th Imię
+               th Nazwisko
+               th Specjalizacja
+         tbody 
+            each user in user_list
+               tr
+                  td.padding0
+                     a.black-link(href=user.url) #{user.name}
+                  td.padding0
+                     a.black-link(href=user.url) #{user.surname}
+                  td.padding0
+                     a.black-link(href=user.url) #{user.spec}
+            else
+               li There are no users.
 
    div(class="col-lg-2 py-5")
       a(href="/api/user/create") Dodaj Pracownika
