@@ -6,20 +6,62 @@ block content
             iframe(src="https://free.timeanddate.com/clock/i7rdaqor/n591/tlpl31/fn13/fs48/tt0/tw0/tm3/tb4" frameborder="0" width="248" height="112")
       div(class='row ')
          div(class='col mr-5 d-flex justify-content-center') Edytuj dzisiejszy raport dla zmiany o numerze:
+
+
       div(class='row pb-5')
          div(class='col pt-4 d-flex justify-content-center')
-            a(type="button" class="btn mx-1 btn-lg btn-block" class=(6 <= today.getHours() && today.getHours() < 14 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/1") 
+            a(type="button" class="btn mx-1 btn-lg btn-block" class=(6 <= today.getHours() && today.getHours() < 14 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/"+(raportYesterday[1] === undefined ? '' : raportYesterday[1]._id)) 
+               h2 1- 
+         div(class='col pt-4 d-flex justify-content-center') 
+            a(type="button" class="btn mx-1btn-lg btn-block" class=( 14 <= today.getHours() && today.getHours() < 22 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/"+(raportYesterday[2] === undefined ? '' : raportYesterday[2]._id)) 
+               h2 2-
+         div(class='col pt-4 mr-5 d-flex justify-content-center')
+            a(type="button" class="btn mx-1 btn-lg btn-block" class=(22 <= today.getHours() || today.getHours() < 6 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/"+(raportYesterday[3] === undefined ? '' : raportYesterday[3]._id)) 
+               h2 3-
+      div(class='row pb-5')
+         div(class='col d-flex ml-1 justify-content-center')
+            a.btn.btn-link(href=('/api/raport/'+raportYesterday[1]) class=(raportYesterday[1] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany porannej
+         div(class='col d-flex justify-content-center')
+            a.btn.btn-link(href=('/api/raport/'+raportYesterday[2]) class=(raportYesterday[2] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany popołudniowej
+         div(class='col d-flex mr-5 justify-content-center')
+            a.btn.btn-link(href=('/api/raport/'+raportYesterday[3]) class=(raportYesterday[3] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany nocnej  
+
+
+
+      div(class='row pb-5')
+         div(class='col pt-4 d-flex justify-content-center')
+            a(type="button" class="btn mx-1 btn-lg btn-block" class=(6 <= today.getHours() && today.getHours() < 14 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/"+(raportToday[1] === undefined ? '' : raportToday[1]._id)) 
                h2 1 
          div(class='col pt-4 d-flex justify-content-center') 
-            a(type="button" class="btn mx-1btn-lg btn-block" class=( 14 <= today.getHours() && today.getHours() < 22 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/2") 
+            a(type="button" class="btn mx-1btn-lg btn-block" class=( 14 <= today.getHours() && today.getHours() < 22 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/"+(raportToday[2] === undefined ? '' : raportToday[2]._id)) 
                h2 2
          div(class='col pt-4 mr-5 d-flex justify-content-center')
-            a(type="button" class="btn mx-1 btn-lg btn-block" class=(22 <= today.getHours() || today.getHours() < 6 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/3") 
+            a(type="button" class="btn mx-1 btn-lg btn-block" class=(22 <= today.getHours() || today.getHours() < 6 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/"+(raportToday[3] === undefined ? '' : raportToday[3]._id)) 
                h2 3
       div(class='row pb-5')
          div(class='col d-flex ml-1 justify-content-center')
-            a.btn.btn-link(href=('/api/raport/'+raport1) class=(raport1 === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany porannej
+            a.btn.btn-link(href=('/api/raport/'+raportToday[1]) class=(raportToday[1] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany porannej
          div(class='col d-flex justify-content-center')
-            a.btn.btn-link(href=('/api/raport/'+raport2) class=(raport2 === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany popołudniowej
+            a.btn.btn-link(href=('/api/raport/'+raportToday[2]) class=(raportToday[2] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany popołudniowej
          div(class='col d-flex mr-5 justify-content-center')
-            a.btn.btn-link(href=('/api/raport/'+raport3) class=(raport3 === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany nocnej   
+            a.btn.btn-link(href=('/api/raport/'+raportToday[3]) class=(raportToday[3] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany nocnej   
+
+
+
+      div(class='row pb-5')
+         div(class='col pt-4 d-flex justify-content-center')
+            a(type="button" class="btn mx-1 btn-lg btn-block" class=(6 <= today.getHours() && today.getHours() < 14 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/"+(raportTomorrow[1] === undefined ? '' : raportTomorrow[1]._id)) 
+               h2 1+ 
+         div(class='col pt-4 d-flex justify-content-center') 
+            a(type="button" class="btn mx-1btn-lg btn-block" class=( 14 <= today.getHours() && today.getHours() < 22 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/"+(raportTomorrow[2] === undefined ? '' : raportTomorrow[2]._id)) 
+               h2 2+
+         div(class='col pt-4 mr-5 d-flex justify-content-center')
+            a(type="button" class="btn mx-1 btn-lg btn-block" class=(22 <= today.getHours() || today.getHours() < 6 ? 'btn-success' : 'btn-secondary') href="/api/raport/create/"+(raportTomorrow[3] === undefined ? '' : raportTomorrow[3]._id)) 
+               h2 3+
+      div(class='row pb-5')
+         div(class='col d-flex ml-1 justify-content-center')
+            a.btn.btn-link(href=('/api/raport/'+raportTomorrow[1]) class=(raportTomorrow[1] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany porannej
+         div(class='col d-flex justify-content-center')
+            a.btn.btn-link(href=('/api/raport/'+raportTomorrow[2]) class=(raportTomorrow[2] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany popołudniowej
+         div(class='col d-flex mr-5 justify-content-center')
+            a.btn.btn-link(href=('/api/raport/'+raportTomorrow[3]) class=(raportTomorrow[3] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany nocnej  
