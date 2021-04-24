@@ -3,7 +3,7 @@ const router = express.Router()
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-  res.redirect('/api/raport/create')
+  res.redirect('/api/raport')
 })
 
 module.exports = router

@@ -130,13 +130,10 @@ router.get('/plan/:id', plan_controller.plan_detail)
 // GET request for list of all raport items
 
 // GET request for creating new raport
-router.get('/raport/create', raport_controller.raport_create)
-// GET request for creating new raport
-
-router.get('/raport/create/:shift', raport_controller.raport_create_get)
+router.get('/raport/create/:id', raport_controller.raport_create_get)
 
 // POST request for creating new raport
-router.post('/raport/create/:shift', raport_controller.raport_create_post)
+router.post('/raport/create/:id', raport_controller.raport_create_post)
 
 // GET request to delete raport
 router.get('/raport/:id/delete', raport_controller.raport_delete_get)

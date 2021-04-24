@@ -30,7 +30,6 @@ function createEmptyInspection() {
   })
   return inspection
 }
-
 function saveDayArray(list_raports) {
   let dayArray = []
   for (let i = 0; i < list_raports.length; i++) {
@@ -46,7 +45,6 @@ function saveDayArray(list_raports) {
   }
   return dayArray
 }
-
 function createRaport(dateStart, dateEnd) {
   inspection = createEmptyInspection()
   dayArray = []
@@ -97,16 +95,16 @@ exports.raport_list = function (req, res, next) {
   let raportToday = []
   let tomorrow0 = new Date()
   let tomorrow24 = new Date()
-  tomorrow0.setHours(24, 0, 0, 0)
-  tomorrow24.setHours(48, 0, 0, 0)
+  tomorrow0.setHours(30, 0, 0, 0)
+  tomorrow24.setHours(53, 59, 0, 0)
   let today0 = new Date()
   let today24 = new Date()
-  today0.setHours(0, 0, 0, 0)
-  today24.setHours(24, 0, 0, 0)
+  today0.setHours(6, 0, 0, 0)
+  today24.setHours(29, 59, 0, 0)
   let yesterday0 = new Date()
   let yesterday24 = new Date()
-  yesterday0.setHours(-48, 0, 0, 0)
-  yesterday24.setHours(-24, 0, 0, 0)
+  yesterday0.setHours(-18, 0, 0, 0)
+  yesterday24.setHours(5, 59, 0, 0)
 
   //find report for TOMORROW
   Raport.find(
@@ -150,6 +148,8 @@ exports.raport_list = function (req, res, next) {
         raportToday = saveDayArray(list_raports_today)
       }
       //find report for YESTERDAY
+      console.log(yesterday0)
+      console.log(yesterday24)
       Raport.find(
         {
           date: {
@@ -277,11 +277,6 @@ exports.raport_detail_download = function (req, res, next) {
   })()
 }
 
-// it's a hub
-exports.raport_create = function (req, res, next) {
-  //delete that
-}
-
 // Display raport create form on GET.
 exports.raport_create_get = function (req, res, next) {
   let inspectionPlaces = [
@@ -295,7 +290,7 @@ exports.raport_create_get = function (req, res, next) {
   async.parallel(
     {
       raport: function (callback) {
-        Raport.findById(req.params.shift)
+        Raport.findById(req.params.id)
           .populate('usersPresent')
           .populate('usersMissing')
           .populate('inspection')
