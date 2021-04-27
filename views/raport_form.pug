@@ -1,18 +1,182 @@
-doctype html
-html(lang='en')
-head
-  title= title
-  meta(charset='utf-8')
-  meta(name='viewport', content='width=device-width, initial-scale=1')
-  link(rel="shortcut icon" type="image/jpg" href="/images/favicon.ico")
-  link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css", integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z", crossorigin="anonymous")
-  link(rel='stylesheet', href='/stylesheets/style.css')
-  link(href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;subset=latin-ext" rel="stylesheet")
+extends layout
+block content
+  // main display
+  div(class='col')
+    div(class='row')
+      div(class='col-lg-5 py-4')
+        table(class='table table-bordered table-umfy')
+          caption Skład zmiany
+          thead.table-dark
+            tr
+              th(scope="col") Imię
+              th(scope="col") Nazwisko
+              th(scope="col") Specjalizacja
+              th(scope="col") Obecny
+          tbody
+            // in the route when 'raport' is created, presence is not passed as an argument so it's undefined
+            // checks on length prevent iterations over empty list AND if the presence is not saved for the first time, basic form generates
 
-  script(src="https://code.jquery.com/jquery-3.5.1.min.js")
-  script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous")
-    // Always remember to call the above files first before calling the bootstrap.min.js file
-  script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous")
+            if (raport.usersPresent.length != 0)
+              each user in raport.usersPresent
+                tr
+                  td #{user.name}
+                  td #{user.surname}
+                  td #{user.spec}
+                  td
+                    div(class='form-check') 
+                      input(class="form-check-input presenceInput" type="checkbox" name=user._id value=1 id=user._id checked=true)
+            if (raport.usersMissing.length != 0)
+              each user in raport.usersMissing
+                tr
+                  td #{user.name}
+                  td #{user.surname}
+                  td #{user.spec}
+                  td
+                    div(class='form-check') 
+                      input(class="form-check-input presenceInput" type="checkbox" name=user._id value=1 id=user._id checked=false)
+
+
+        div.float-right
+          button(class="btn btn-primary mb-2" type='button' id='postPresenceButton' data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz          
+
+        table(class="table table-bordered table-umfy") 
+          caption Obchód
+          thead.table-dark
+            tr 
+              th(scope="col") Miejsce
+              th(scope="col") Komentarz
+              th(scope="col") Stan
+          tbody
+            each place in inspectionPlaces
+              tr
+                td #{place[2]}
+                td 
+                  input(class="form-control placesInput" type="text" id=place[0] value=raport.inspection[place[0]])
+                td
+                  div(class='form-check') 
+                    input(class="form-check-input placesInput" type="checkbox" id=place[1] value=1 checked=raport.inspection[place[1]])
+        div.float-right
+          button(class="btn btn-primary mb-2" type='button' id="postPlacesButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
+
+        table(class='table table-bordered table-umfy') 
+          caption Prace Planowane
+          thead.table-dark
+            tr
+              th Opis
+              th Komentarz
+              th Stan
+          tbody
+            each item in raport.plan
+              tr
+                td #{item.desc}
+                td
+                  input(class="form-control planInput" class=("_" + item._id) type="text" value=item.comments)
+                  // if css class begins with number you have to transform it into unicode like so:
+                  // class='12'; document.querySelectorAll("input.form-control.\\31\\32")
+                  // https://mathiasbynens.be/notes/css-escapes
+                  // it's easier to add a non-numeric character at the begining of a class name
+                td
+                  div(class='form-check') 
+                    input(class="form-check-input planInput" class='_'+item._id type="checkbox" value=1 checked=item.isDone)
+
+
+        div.float-right
+          button(class="btn btn-primary mb-2 " type='button' id="postPlanButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz          
+
+
+        div(class="form-group")
+          // table and caption just to be consistant with the layout
+          table(class='table umfy-ghost-table')
+            caption Dodatkowe informacje
+          textarea(class="form-control additionalTextarea mt-1" rows=10 type="text") #{raport.additional}
+        div.float-right
+          button(class="btn btn-primary" type='button'  id="postAdditionalButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
+
+      // --- --- --- AWARIE --- --- ---
+      div(class='col-lg-7 py-4') 
+        h2 Awarie
+
+        // breakdowns from DB:
+        div(class='accordion')
+          each breakdown in raport.breakdown
+            .card
+              .card-header
+                h5.mb-0
+                  // I added _ because I want other Div to have 'breakdown._id' as id.
+                  button.btn.btn-link(data-toggle='collapse' data-target=('#_'+breakdown._id) aria-expanded='true' aria-controls='collapseOne')
+                    | Awaria:  #{breakdown.diagnostics}
+              .collapse(data-parent='#accordion' id='_'+breakdown._id)
+                .card-body.umfy-card-body
+                  .col.bg-danger.text-light(id=breakdown._id)
+                    .row
+                      .col
+                        .form-group.mt-2
+                          label  Numer zlecenia 
+                          input.form-control.orderNumber(class=("BreakdownB_"+breakdown._id) type='text' value=breakdown.orderNumber)
+                    .row
+                      .col
+                        select.form-control.line(class=("BreakdownB_"+breakdown._id))
+                          each item in lineList
+                            option( value=item._id selected=(breakdown.line._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
+                      .col
+                        select.form-control.devicetype(class=("BreakdownB_"+breakdown._id))
+                          each item in devicetypeList
+                            option( value=item._id selected=(breakdown.devicetype._id.toString()===item._id.toString() ? 'selected' : false))  #{item.name}
+                      .col
+                        select.form-control.device(class=("BreakdownB_"+breakdown._id))
+                          each item in deviceList
+                            option( value=item._id selected=(breakdown.device._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
+                    .row.mt-3
+                      .col
+                        label(for='appt')  Godzina rozpoczęcia awarii
+                        - var nDB = new Date(breakdown.dateBegin)
+                        // slice makes sure the format includes 0 in (12:01) for example
+                        input#appt.dateBegin(class=("BreakdownB_"+breakdown._id) type='time' name='appt' value=(("0" + nDB.getHours()).slice(-2)+':'+("0" + nDB.getMinutes()).slice(-2)))
+                      .col
+                        label(for='appt-end')  Godzina zakończenia awarii 
+                        - var nDE = new Date(breakdown.dateEnd)
+                        input#appt-end.dateEnd(class=("BreakdownB_"+breakdown._id) type='time' name='appt-end' value=(("0" + nDE.getHours()).slice(-2)+':'+("0" + nDE.getMinutes()).slice(-2)))
+                    .row
+                      .col.mt-3
+                        | Diagnostyka
+                        textarea.form-control.diagnostics(class=("BreakdownB_"+breakdown._id) rows='2' type='text') #{breakdown.diagnostics}
+                    .row
+                      .col.mt-3
+                        | Działanie
+                        textarea.form-control.treatment(class=("BreakdownB_"+breakdown._id) rows='2' type='text') #{breakdown.treatment}
+                    .row.mt-2
+                      .col.d-flex.justify-content-between
+                        .form-check.form-check-inline
+                          input.form-check-input.statusRepaired(type='radio' id=('inlineRadio1'+breakdown._id) name='inlineRadioOptions' value='1' checked=(breakdown.status===1 ? true : false))
+                          label.form-check-label(for='inlineRadio1'+breakdown._id)  Naprawiono 
+                        .form-check.form-check-inline
+                          input.form-check-input.statusNotRepaired(type='radio' id=('inlineRadio2'+breakdown._id) name='inlineRadioOptions' value='2' checked=(breakdown.status===2 ? true : false))
+                          label.form-check-label(for='inlineRadio2'+breakdown._id)  Nie naprawiono 
+                        .form-check.form-check-inline
+                          input.form-check-input.statusTemporary(type='radio' id=('inlineRadio3'+breakdown._id) name='inlineRadioOptions' value='3' checked=(breakdown.status===3 ? true : false))
+                          label.form-check-label(for='inlineRadio3'+breakdown._id)  Rozwiązanie tymczasowe 
+                    .row
+                      .col.mt-3
+                        | Uzyte części
+                        textarea.form-control.partsUsed(class=("BreakdownB_"+breakdown._id) rows='1' type='text') #{breakdown.partsUsed}
+                    .row
+                      .col.mt-3
+                        | Części do zamówienia
+                        textarea.form-control.partsToOrder(class=("BreakdownB_"+breakdown._id) rows='1' type='text') #{breakdown.partsToOrder}
+                    .row
+                      .col.mt-3
+                        | Prace na postój
+                        textarea.form-control.plannedAction(class=("BreakdownB_"+breakdown._id) rows='1' type='text') #{breakdown.plannedAction}
+                    .row
+                      .col.mb-3
+                        button.btn.btn-primary.mt-3.float-right(class="updateBreakdownButton" type="button" id=("B_"+breakdown._id) onclick="addBreakdown(this)" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!")  Zapisz 
+          
+
+        // Add Breakdown Button
+        div 
+          button(class="btn btn-danger my-4" type='button' id="addBreakdownButton") Dodaj    
+        div(id='breakdown' title="")
+
   script.
     $(document).ready(function(){
       // https://stackoverflow.com/a/48238659/13527337
@@ -433,264 +597,5 @@ head
       $.post("", {action: 'postInspection', postPlaces: JSON.stringify(postPlaces), inspectionId: inspectionId})
     }); 
     });
-
-body
-  header
-    nav(class="navbar navbar-dark bg-gestampblue navbar-expand-lg")
-      a(href="/api/raport/create" class="navbar-brand")
-        img(src="https://www.gestamp.com/Gestamp11/media/GestampFiles/Logo-Gestamp-(white)02.svg" height="30" class="d-inline-block align-bottom mr-4" alt="Gestamp ಠ_ಠ")
-      button(class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu")
-        span(class="navbar-toggler-icon")
-      div(class="collapse navbar-collapse" id="mainmenu")
-        ul(class="navbar-nav")
-          li(class="nav-item")
-            a(class="nav-link" href="/api/raport") Raport
-          li(class="nav-item")
-            a(class="nav-link" href="/api/plan") Prace Planowane
-          li(class="nav-item dropdown")
-            a(class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" id="device-dropdown") Menedżer urządzeń
-            div(class="dropdown-menu")
-              a(class="dropdown-item" href="/api/line") Linie Produkcyjne
-              a(class="dropdown-item" href="/api/devicetype") Typy Urządzeń
-              a(class="dropdown-item" href="/api/device") Urządzenia
-          li(class="nav-item dropdown")
-            a(class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" id="search-dropdown") Zarządzanie zespołem
-            div(class="dropdown-menu")
-              a(class="dropdown-item" href="/api/user") Pracownicy
-              a(class="dropdown-item" href="/api/user/team") Skład Zmiany
-          li(class="nav-item dropdown")
-            a(class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" id="search-dropdown") Wyszukiwanie
-            div(class="dropdown-menu")
-              a(class="dropdown-item" href="search/raport") Raporty
-              a(class="dropdown-item" href="/search/breakdown") Awarie
-
-  div(class='container-fluid')
-    div(class='row')
-      // navbar
-      aside(class='col-sm-2 my-3 umfy-vertical-navbar')
-
-        div(class="accordion" id="accordionExample")
-
-          div(class="card bg-gestampblue")
-            div(class="card-header" id="headingReport")
-              a(href="/api/raport")
-                button(class="btn btn-link btn-block text-left  text-light" type="button")
-                  | Raport
-
-          div(class="card bg-gestampblue")
-            div(class="card-header" id="headingPlan")
-              a(href="/api/plan")
-                button(class="btn btn-link btn-block text-left  text-light" type="button")
-                  | Prace planowane
-
-
-          div(class="card bg-gestampblue")
-            div(class="card-header" id="headingOne")
-              h2(class="mb-0")
-                button(class="btn btn-link btn-block text-left collapsed text-light" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne")
-                  Collapsible Menedżer urządzeń
-            div(id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample")
-              div(class="card-body bg-light")
-                a(class="dropdown-item" href="/api/line") Linie produkcyjne
-                a(class="dropdown-item" href="/api/devicetype") Typy Urządzeń
-                a(class="dropdown-item" href="/api/device") Urządzenia
-
-
-          div(class="card bg-gestampblue")
-            div(class="card-header" id="headingTwo")
-              h2(class="mb-0")
-                button(class="btn btn-link btn-block text-left collapsed text-light" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo")
-                  Collapsible Zarządzanie zespołem
-            div(id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample")
-              div(class="card-body bg-light")
-                a(class="dropdown-item" href="/api/user") Pracownicy
-                a(class="dropdown-item" href="/api/user/team") Skład Zmiany
-
-          div(class="card bg-gestampblue")
-            div(class="card-header" id="headingThree")
-              h2(class="mb-0")
-                button(class="btn btn-link btn-block text-left collapsed text-light" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree")
-                  Collapsible Wyszukiwanie
-            div(id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample")
-              div(class="card-body bg-light")
-                a(class="dropdown-item" href="/api/search/raport") Raporty
-                a(class="dropdown-item" href="/api/search/breakdown") Awarie
-
-      // main display
-      div(class='col')
-        div(class='row')
-          div(class='col-lg-5 py-4')
-            table(class='table table-bordered table-umfy')
-              caption Skład zmiany
-              thead
-                tr
-                  th(scope="col") Imię
-                  th(scope="col") Nazwisko
-                  th(scope="col") Specjalizacja
-                  th(scope="col") Obecny
-              tbody
-                // in the route when 'raport' is created, presence is not passed as an argument so it's undefined
-                // checks on length prevent iterations over empty list AND if the presence is not saved for the first time, basic form generates
-
-                if (raport.usersPresent.length != 0)
-                  each user in raport.usersPresent
-                    tr
-                      td #{user.name}
-                      td #{user.surname}
-                      td #{user.spec}
-                      td
-                        div(class='form-check') 
-                          input(class="form-check-input presenceInput" type="checkbox" name=user._id value=1 id=user._id checked=true)
-                if (raport.usersMissing.length != 0)
-                  each user in raport.usersMissing
-                    tr
-                      td #{user.name}
-                      td #{user.surname}
-                      td #{user.spec}
-                      td
-                        div(class='form-check') 
-                          input(class="form-check-input presenceInput" type="checkbox" name=user._id value=1 id=user._id checked=false)
-
-
-            div.float-right
-              button(class="btn btn-primary mb-2" type='button' id='postPresenceButton' data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz          
-
-            table(class="table table-bordered table-umfy") 
-              caption Obchód
-              thead 
-                tr 
-                  th(scope="col") Miejsce
-                  th(scope="col") Komentarz
-                  th(scope="col") Stan
-              tbody
-                each place in inspectionPlaces
-                  tr
-                    td #{place[2]}
-                    td 
-                      input(class="form-control placesInput" type="text" id=place[0] value=raport.inspection[place[0]])
-                    td
-                      div(class='form-check') 
-                        input(class="form-check-input placesInput" type="checkbox" id=place[1] value=1 checked=raport.inspection[place[1]])
-            div.float-right
-              button(class="btn btn-primary mb-2" type='button' id="postPlacesButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
-
-            table(class='table table-bordered table-umfy') 
-              caption Prace Planowane
-              thead 
-                tr
-                  th Opis
-                  th Komentarz
-                  th Stan
-              tbody
-                each item in raport.plan
-                  tr
-                    td #{item.desc}
-                    td
-                      input(class="form-control planInput" class=("_" + item._id) type="text" value=item.comments)
-                      // if css class begins with number you have to transform it into unicode like so:
-                      // class='12'; document.querySelectorAll("input.form-control.\\31\\32")
-                      // https://mathiasbynens.be/notes/css-escapes
-                      // it's easier to add a non-numeric character at the begining of a class name
-                    td
-                      div(class='form-check') 
-                        input(class="form-check-input planInput" class='_'+item._id type="checkbox" value=1 checked=item.isDone)
-
-
-            div.float-right
-              button(class="btn btn-primary mb-2 " type='button' id="postPlanButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz          
-
-
-            div(class="form-group")
-              // table and caption just to be consistant with the layout
-              table(class='table umfy-ghost-table')
-                caption Dodatkowe informacje
-              textarea(class="form-control additionalTextarea mt-1" rows=10 type="text") #{raport.additional}
-            div.float-right
-              button(class="btn btn-primary" type='button'  id="postAdditionalButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
-
-          // --- --- --- AWARIE --- --- ---
-          div(class='col-lg-7 py-4') 
-            h2 Awarie
-
-            // breakdowns from DB:
-            div(class='accordion')
-              each breakdown in raport.breakdown
-                .card
-                  .card-header
-                    h5.mb-0
-                      // I added _ because I want other Div to have 'breakdown._id' as id.
-                      button.btn.btn-link(data-toggle='collapse' data-target=('#_'+breakdown._id) aria-expanded='true' aria-controls='collapseOne')
-                        | Awaria:  #{breakdown.diagnostics}
-                  .collapse(data-parent='#accordion' id='_'+breakdown._id)
-                    .card-body.umfy-card-body
-                      .col.bg-danger.text-light(id=breakdown._id)
-                        .row
-                          .col
-                            .form-group.mt-2
-                              label  Numer zlecenia 
-                              input.form-control.orderNumber(class=("BreakdownB_"+breakdown._id) type='text' value=breakdown.orderNumber)
-                        .row
-                          .col
-                            select.form-control.line(class=("BreakdownB_"+breakdown._id))
-                              each item in lineList
-                                option( value=item._id selected=(breakdown.line._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
-                          .col
-                            select.form-control.devicetype(class=("BreakdownB_"+breakdown._id))
-                              each item in devicetypeList
-                                option( value=item._id selected=(breakdown.devicetype._id.toString()===item._id.toString() ? 'selected' : false))  #{item.name}
-                          .col
-                            select.form-control.device(class=("BreakdownB_"+breakdown._id))
-                              each item in deviceList
-                                option( value=item._id selected=(breakdown.device._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
-                        .row.mt-3
-                          .col
-                            label(for='appt')  Godzina rozpoczęcia awarii
-                            - var nDB = new Date(breakdown.dateBegin)
-                            // slice makes sure the format includes 0 in (12:01) for example
-                            input#appt.dateBegin(class=("BreakdownB_"+breakdown._id) type='time' name='appt' value=(("0" + nDB.getHours()).slice(-2)+':'+("0" + nDB.getMinutes()).slice(-2)))
-                          .col
-                            label(for='appt-end')  Godzina zakończenia awarii 
-                            - var nDE = new Date(breakdown.dateEnd)
-                            input#appt-end.dateEnd(class=("BreakdownB_"+breakdown._id) type='time' name='appt-end' value=(("0" + nDE.getHours()).slice(-2)+':'+("0" + nDE.getMinutes()).slice(-2)))
-                        .row
-                          .col.mt-3
-                            | Diagnostyka
-                            textarea.form-control.diagnostics(class=("BreakdownB_"+breakdown._id) rows='2' type='text') #{breakdown.diagnostics}
-                        .row
-                          .col.mt-3
-                            | Działanie
-                            textarea.form-control.treatment(class=("BreakdownB_"+breakdown._id) rows='2' type='text') #{breakdown.treatment}
-                        .row.mt-2
-                          .col.d-flex.justify-content-between
-                            .form-check.form-check-inline
-                              input.form-check-input.statusRepaired(type='radio' id=('inlineRadio1'+breakdown._id) name='inlineRadioOptions' value='1' checked=(breakdown.status===1 ? true : false))
-                              label.form-check-label(for='inlineRadio1'+breakdown._id)  Naprawiono 
-                            .form-check.form-check-inline
-                              input.form-check-input.statusNotRepaired(type='radio' id=('inlineRadio2'+breakdown._id) name='inlineRadioOptions' value='2' checked=(breakdown.status===2 ? true : false))
-                              label.form-check-label(for='inlineRadio2'+breakdown._id)  Nie naprawiono 
-                            .form-check.form-check-inline
-                              input.form-check-input.statusTemporary(type='radio' id=('inlineRadio3'+breakdown._id) name='inlineRadioOptions' value='3' checked=(breakdown.status===3 ? true : false))
-                              label.form-check-label(for='inlineRadio3'+breakdown._id)  Rozwiązanie tymczasowe 
-                        .row
-                          .col.mt-3
-                            | Uzyte części
-                            textarea.form-control.partsUsed(class=("BreakdownB_"+breakdown._id) rows='1' type='text') #{breakdown.partsUsed}
-                        .row
-                          .col.mt-3
-                            | Części do zamówienia
-                            textarea.form-control.partsToOrder(class=("BreakdownB_"+breakdown._id) rows='1' type='text') #{breakdown.partsToOrder}
-                        .row
-                          .col.mt-3
-                            | Prace na postój
-                            textarea.form-control.plannedAction(class=("BreakdownB_"+breakdown._id) rows='1' type='text') #{breakdown.plannedAction}
-                        .row
-                          .col.mb-3
-                            button.btn.btn-primary.mt-3.float-right(class="updateBreakdownButton" type="button" id=("B_"+breakdown._id) onclick="addBreakdown(this)" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!")  Zapisz 
-              
-
-            // Add Breakdown Button
-            div 
-              button(class="btn btn-danger my-4" type='button' id="addBreakdownButton") Dodaj    
-            div(id='breakdown' title="")
 
 

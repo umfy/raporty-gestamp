@@ -3,58 +3,81 @@ block content
    div(class='col')
       div(class='row')
          div(class='col h2 mr-5 d-flex justify-content-center umfy-clock')
-            div(id="clock" class="clock") #{today.toLocaleString()}
+            div(id="clock" class="clock") #{new Date()}
 
             //iframe(src="https://free.timeanddate.com/clock/i7rdaqor/n591/tlpl31/fn13/fs48/tt0/tw0/tm3/tb4" frameborder="0" width="248" height="112")
       div(class='row ')
-         div(class='col mr-5 d-flex justify-content-center') Edytuj dzisiejszy raport dla zmiany o numerze:
+         div(class='col mr-5 d-flex justify-content-center') Edytuj raport dla zmiany o numerze:
 
       div(class='row pb-5')
-         div(class='col dropdown pt-4 d-flex justify-content-center btn-group')
-            a(class="btn btn-info btn-lg btn-block" type="button" href=('/api/raport/create/'+raportYesterday[3]) class=(raportYesterday[1] === undefined ? 'disabled' : '')) 
-               h2 3
-            button#dropdownMenuReference.btn.btn-info.dropdown-toggle.dropdown-toggle-split(class=(raportYesterday[1] === undefined ? 'disabled' : '') type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' data-reference='parent')
-               span.sr-only Toggle Dropdown
-            .dropdown-menu(style="min-width: 58px;" aria-labelledby='dropdownMenuReference')
-               a.dropdown-item.text-center(href=('/api/raport/create/'+raportYesterday[1]) class=(raportYesterday[1] === undefined ? 'disabled' : '')) 1
-               a.dropdown-item.text-center(href=('/api/raport/create/'+raportYesterday[2]) class=(raportYesterday[2] === undefined ? 'disabled' : '')) 2
-               a.dropdown-item.text-center(href=('/api/raport/create/'+raportYesterday[3]) class=(raportYesterday[3] === undefined ? 'disabled' : '')) 3
-         
          div(class='col pt-4 d-flex justify-content-center')
-            a(id='shift1Today' type="button" class="btn btn-secondary mx-1 btn-lg btn-block" href="/api/raport/create/"+(raportToday[1] === undefined ? '' : raportToday[1]._id)) 
-               h2 1 
-         div(class='col pt-4 d-flex justify-content-center') 
-            a(id='shift2Today' type="button" class="btn btn-secondary mx-1 btn-lg btn-block" href="/api/raport/create/"+(raportToday[2] === undefined ? '' : raportToday[2]._id)) 
-               h2 2
-         div(class='col pt-4 d-flex justify-content-center')
-            a(id='shift3Today' type="button" class="btn btn-secondary mx-1 btn-lg btn-block" href="/api/raport/create/"+(raportToday[3] === undefined ? '' : raportToday[3]._id)) 
-               h2 3
+            table.table
+               thead.table-dark
+                  tr
+                     th.text-center Wczorajsze Raporty
+               tbody
+                  tr
+                     td.umfy-td-border  
+                        div(class='col dropdown d-flex justify-content-center btn-group')
+                           a(class="btn btn-secondary btn-lg btn-block" type="button" href=('/api/raport/create/'+raportYesterday[3]) class=(raportYesterday[1] === undefined ? 'disabled' : '')) 
+                              h2 3
+                           button#dropdownMenuReference.btn.btn-secondary.dropdown-toggle.dropdown-toggle-split(class=(raportYesterday[1] === undefined ? 'disabled' : '') type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' data-reference='parent')
+                              span.sr-only Toggle Dropdown
+                           .dropdown-menu(style="min-width: 100px;" aria-labelledby='dropdownMenuReference')
+                              a.dropdown-item.text-center(href=('/api/raport/create/'+raportYesterday[1]) class=(raportYesterday[1] === undefined ? 'disabled' : '')) 1
+                              a.dropdown-item.text-center(href=('/api/raport/create/'+raportYesterday[2]) class=(raportYesterday[2] === undefined ? 'disabled' : '')) 2
+                              a.dropdown-item.text-center(href=('/api/raport/create/'+raportYesterday[3]) class=(raportYesterday[3] === undefined ? 'disabled' : '')) 3
+                  tr
+                     td
+                        a.btn.btn-link(href=('/api/raport/'+raportToday[3]) class=(raportYesterday[3] === undefined ? 'disabled' : '')) Wyświetl raport dla poprzedniej zmiany nocnej 
+        
+
+         div(class='col-lg-7 pt-4 d-flex justify-content-center')
+            table.table
+               thead.table-dark
+                  tr
+                     th.text-center(colspan='3') Dzisiejsze Raporty
+               tbody
+                  tr
+                     td.umfy-td-border(style="width: 33%")
+                        a(id='shift1Today' type="button" class="btn btn-secondary mx-1 btn-lg btn-block" href="/api/raport/create/"+(raportToday[1] === undefined ? '' : raportToday[1]._id)) 
+                           h2 1 
+                     td.umfy-td-border(style="width: 33%")
+                        a(id='shift2Today' type="button" class="btn btn-secondary mx-1 btn-lg btn-block" href="/api/raport/create/"+(raportToday[2] === undefined ? '' : raportToday[2]._id)) 
+                           h2 2
+                     td.umfy-td-border(style="width: 33%")
+                        a(id='shift3Today' type="button" class="btn btn-secondary mx-1 btn-lg btn-block" href="/api/raport/create/"+(raportToday[3] === undefined ? '' : raportToday[3]._id)) 
+                           h2 3
+                  tr
+                     td
+                        a.btn.btn-link(href=('/api/raport/'+raportToday[1]) class=(raportToday[1] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany porannej
+                     td
+                        a.btn.btn-link(href=('/api/raport/'+raportToday[2]) class=(raportToday[2] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany popołudniowej
+                     td
+                        a.btn.btn-link(href=('/api/raport/'+raportToday[3]) class=(raportToday[3] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany nocnej 
          
-         div.umfy-margin-right(class='col dropdown pt-4 d-flex justify-content-center btn-group')
-            a(class="btn btn-info btn-lg btn-block" type="button" href=('/api/raport/create/'+raportTomorrow[1])) 
-               h2 1
-            button#dropdownMenuReference.btn.btn-info.dropdown-toggle.dropdown-toggle-split(type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' data-reference='parent')
-               span.sr-only Toggle Dropdown
-            .dropdown-menu(style="min-width: 58px;" aria-labelledby='dropdownMenuReference')
-               a.dropdown-item.text-center(href=('/api/raport/create/'+raportTomorrow[1]) class=(raportTomorrow[1] === undefined ? 'disabled' : '')) 1
-               a.dropdown-item.text-center(href=('/api/raport/create/'+raportTomorrow[2]) class=(raportTomorrow[2] === undefined ? 'disabled' : '')) 2
-               a.dropdown-item.text-center(href=('/api/raport/create/'+raportTomorrow[3]) class=(raportTomorrow[3] === undefined ? 'disabled' : '')) 3
+         div.umfy-margin-right(class='col pt-4 d-flex justify-content-center')
+            table.table
+               thead.table-dark
+                  tr
+                     th.text-center Jutrzejsze Raporty
+               tbody
+                  tr
+                     td.umfy-td-border    
+                        div(class='col dropdown d-flex justify-content-center btn-group')
+                           a(class="btn btn-secondary btn-lg btn-block" type="button" href=('/api/raport/create/'+raportTomorrow[1])) 
+                              h2 1
+                           button#dropdownMenuReference.btn.btn-secondary.dropdown-toggle.dropdown-toggle-split(type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' data-reference='parent')
+                              span.sr-only Toggle Dropdown
+                           .dropdown-menu(style="min-width: 100px;" aria-labelledby='dropdownMenuReference')
+                              a.dropdown-item.text-center(href=('/api/raport/create/'+raportTomorrow[1]) class=(raportTomorrow[1] === undefined ? 'disabled' : '')) 1
+                              a.dropdown-item.text-center(href=('/api/raport/create/'+raportTomorrow[2]) class=(raportTomorrow[2] === undefined ? 'disabled' : '')) 2
+                              a.dropdown-item.text-center(href=('/api/raport/create/'+raportTomorrow[3]) class=(raportTomorrow[3] === undefined ? 'disabled' : '')) 3
+                  tr
+                     td
+                        a.btn.btn-link(href=('/api/raport/'+raportToday[3]) class=(raportTomorrow[1] === undefined ? 'disabled' : '')) Wyświetl raport dla następnej zmiany porannej
 
-      div(class='row pb-5')
-         div(class='col d-flex justify-content-center')
-            a.btn.btn-link(href=('/api/raport/'+raportToday[3]) class=(raportYesterday[3] === undefined ? 'disabled' : '')) Wyświetl raport dla poprzedniej zmiany nocnej 
-        
-         div(class='col d-flex ml-1 justify-content-center')
-            a.btn.btn-link(href=('/api/raport/'+raportToday[1]) class=(raportToday[1] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany porannej
-         div(class='col d-flex justify-content-center')
-            a.btn.btn-link(href=('/api/raport/'+raportToday[2]) class=(raportToday[2] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany popołudniowej
-         div(class='col d-flex justify-content-center')
-            a.btn.btn-link(href=('/api/raport/'+raportToday[3]) class=(raportToday[3] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany nocnej 
-        
-         div.umfy-margin-right(class='col d-flex justify-content-center')
-            a.btn.btn-link(href=('/api/raport/'+raportToday[3]) class=(raportTomorrow[1] === undefined ? 'disabled' : '')) Wyświetl raport dla następnej zmiany porannej
-
-
+   
    script.
       function update() {
          now = new Date()

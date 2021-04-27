@@ -1,0 +1,144 @@
+extends layout
+block content
+   div(class='col-lg-7')
+      div(class='row')
+         div(class="col my-5")
+            h1.text-center.mb-5 Wyszukiwanie Raportów
+      div(class='row')
+         div(class="col my-2")
+
+            table.table.table-bordered
+               thead.table-dark
+                  tr
+                     th.text-center(colspan='4') Czas wystąpienia awarii
+               tbody
+                  td 
+                     label(for='dateStart') Od
+                     input.form-control#dateStart(type='date' name='date_execution')
+                  td 
+
+                     label(for='dateEnd') Do
+                     input.form-control#dateEnd(type='date' name='date_execution')
+                  td
+                     label(for='timespan') Czas trwania: 
+                     input.form-control#timespan(type='time' name='appt')
+                  td 
+                     label(for='shiftnum') Zmiana
+                     select.form-control#shiftnum
+                        option(selected='selected') Dowolna
+                        option 1
+                        option 2
+                        option 3
+      div(class='row')
+         div.col.my-2
+            table.table.table-bordered
+               thead.table-dark
+                  tr
+                     th.text-center(colspan='3') Urządzenie
+               tbody
+                  td 
+                     select.form-control#line
+                        option(value='defaultvalue' selected=true) Dowolna Linia
+                        each item in lineList
+                           option( value=item._id) #{item.name}
+                  td
+                     select.form-control#devicetype
+                        option(value='defaultvalue' selected=true) Dowolny Typ
+                        each item in devicetypeList
+                           option( value=item._id)  #{item.name}
+                  td
+                     select.form-control#device
+                        option(value='defaultvalue' selected=true) Dowolne Urządzenie
+                        each item in deviceList
+                           option( value=item._id ) #{item.name}
+      div(class='row')   
+         div.col.my-2            
+            table.table.table-bordered(id='users')
+               thead.table-dark
+                  tr
+                     th.text-center Obecni na zmianie
+               tbody
+                  tr
+                     td
+                        button(class="btn btn-danger" type='button' id="addUserButton") Dodaj
+      div(class='row')
+         div.col.my-2
+            table.table.table-bordered.mb-5
+               thead.table-dark
+                  tr
+                     th.text-center(colspan='2') Obchód - wadliwy element
+               tbody
+                  tr
+                     td
+                        select.form-control#inspection
+                           option(value='defaultvalue' selected=true) Dowolny
+                           each place in inspectionPlaces
+                              option(value=place[1]) #{place[2]}
+
+      div(class='row')
+         div.col.my-2
+            button(class="btn btn-primary mb-2" type='button' id="postSearchButton" ) Wyszukaj    
+
+
+
+
+   script.
+      $(document).ready(function(){
+         let usersList = !{JSON.stringify(userList)}
+         let users = ''
+         for(let i=0; i<usersList.length; i++) {
+            users = users + '<option value='+ usersList[i]._id +'>' + usersList[i].name + ' ' + usersList[i].surname + '</option>';
+
+         }
+         $("#addUserButton").click(function(){
+            $('#users thead').after(`
+               <tr>
+                  <td>
+                     <select class='form-control user'>
+                        <option> Nie wybrano </option>
+                        `+users+`
+                     </select>
+                  </td>
+               </tr>
+            `)
+         })
+      })
+
+   script.
+      $(document).ready(function() {
+         $("#postSearchButton").click(function(){
+            // 'list'
+            let users = document.querySelectorAll('#users .user')
+
+            // id
+            let line = document.querySelector('#line').value
+            let devicetype = document.querySelector('#devicetype').value
+            let device = document.querySelector('#device').value
+
+            // string
+            let inspection = document.querySelector('#inspection').value
+            let dateStart = document.querySelector('#dateStart').value
+            let dateEnd = document.querySelector('#dateEnd').value
+            let timespan = (document.querySelector('#timespan').value)
+            let shiftnum = document.querySelector('#shiftnum').value
+
+            dateStart = new Date(dateStart) 
+            dateEnd = new Date(dateEnd) 
+            dateStart.setHours(0,0,0,0)
+            dateEnd.setHours(24,0,0,0)
+
+            $.post("", {
+               users: JSON.stringify(users), 
+               line: line, 
+               devicetype: devicetype,
+               device: device,
+               inspection: inspection,
+               dateStart: dateStart,
+               dateEnd: dateEnd,
+               timespan: timespan,
+               shiftnum: shiftnum 
+            }, function(data){
+                console.log(data)
+            })
+         })
+      })

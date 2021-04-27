@@ -167,12 +167,12 @@ exports.raport_list = function (req, res, next) {
           raportYesterday = saveDayArray(list_raports_yesterday)
           // I don't care about those that don't exist
         }
-
+        // todd = new Date()
+        // todd.setHours(30, 0, 0, 0)
         res.render('raport_pick', {
           raportToday: raportToday,
           raportTomorrow: raportTomorrow,
           raportYesterday: raportYesterday,
-          today: new Date(),
         })
       })
     })
