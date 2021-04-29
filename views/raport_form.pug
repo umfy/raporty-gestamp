@@ -1,9 +1,9 @@
 extends layout
 block content
   // main display
-  div(class='col')
+  div(class='col mx-md-5')
     div(class='row')
-      div(class='col-lg-5 py-4')
+      div(class='col-lg-4 py-4')
         table(class='table table-bordered table-umfy')
           caption Skład zmiany
           thead.table-dark
@@ -65,19 +65,19 @@ block content
               th Opis
               th Komentarz
               th Stan
-          tbody
-            each item in raport.plan
-              tr
-                td #{item.desc}
-                td
-                  input(class="form-control planInput" class=("_" + item._id) type="text" value=item.comments)
-                  // if css class begins with number you have to transform it into unicode like so:
-                  // class='12'; document.querySelectorAll("input.form-control.\\31\\32")
-                  // https://mathiasbynens.be/notes/css-escapes
-                  // it's easier to add a non-numeric character at the begining of a class name
-                td
-                  div(class='form-check') 
-                    input(class="form-check-input planInput" class='_'+item._id type="checkbox" value=1 checked=item.isDone)
+          //- tbody
+          //-   each item in raport.plan
+          //-     tr
+          //-       td #{item.desc}
+          //-       td
+          //-         input(class="form-control planInput" class=("_" + item._id) type="text" value=item.comments)
+          //-         // if css class begins with number you have to transform it into unicode like so:
+          //-         // class='12'; document.querySelectorAll("input.form-control.\\31\\32")
+          //-         // https://mathiasbynens.be/notes/css-escapes
+          //-         // it's easier to add a non-numeric character at the begining of a class name
+          //-       td
+          //-         div(class='form-check') 
+          //-           input(class="form-check-input planInput" class='_'+item._id type="checkbox" value=1 checked=item.isDone)
 
 
         div.float-right
@@ -93,7 +93,7 @@ block content
           button(class="btn btn-primary" type='button'  id="postAdditionalButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
 
       // --- --- --- AWARIE --- --- ---
-      div(class='col-lg-7 py-4') 
+      div(class='col-lg-8 py-4') 
         h2 Awarie
 
         // breakdowns from DB:

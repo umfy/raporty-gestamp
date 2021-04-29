@@ -30,7 +30,6 @@ exports.device_list = function (req, res, next) {
       if (err) {
         return next(err)
       }
-      console.log('?DA?SD?AD')
       res.render('device_list', {
         title: 'Lista Urządzeń',
         device_list: result.device,

@@ -1,9 +1,10 @@
 extends layout
 
 block content
-   div(class="col-sm-7 my-5")
+   div(class="col mx-md-5 my-5")
       h1.text-center.mb-5= title
 
+      a.btn.btn-primary.my-2(href="/api/devicetype/create") Utwórz Typ Urządzenia
       table.table.table-bordered.table-striped.table-hover.dark-header-hover
          thead.table-dark
             tr
@@ -16,5 +17,3 @@ block content
             else
                li Brak typów urządzeń.
    
-   div(class="col-lg-2 my-5")
-      a(href="/api/devicetype/create") Utwórz Typ Urządzenia

@@ -1,7 +1,7 @@
 extends layout
 
 block content
-   div(class="col-sm-7 my-5")
+   div(class="col mx-md-5 my-5")
       h1 Pracownik UR:  
       h4 #{user.fullname}
       p #[strong Email:] #{user.email}
@@ -14,7 +14,6 @@ block content
          if user.isAdmin
             li Admin
       
-   div(class="col-lg-2 my-5")
-        a(href=user.url + '/delete') Usuń 
-        p
-        a(href=user.url + '/update') Zmodyfikuj 
+      a.btn.btn-primary.my-5.mr-2(href=user.url + '/delete') Usuń 
+    
+      a.btn.btn-primary.my-5.mr-2(href=user.url + '/update') Zmodyfikuj 

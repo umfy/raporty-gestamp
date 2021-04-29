@@ -4,11 +4,19 @@ const { DateTime } = require('luxon')
 const Schema = mongoose.Schema
 
 const PlanSchema = new Schema({
-  desc: { type: String, required: true },
+  title: { type: String, required: true },
+  desc: { type: String },
   date_created: { type: Date, required: true },
   date_execution: { type: Date },
   shift: { type: Number },
-  isDone: { type: Boolean, required: true },
+  timespan: { type: String },
+  line: { type: Schema.Types.ObjectId, ref: 'Line' },
+  operation: { type: Schema.Types.ObjectId, ref: 'Operation' },
+  devicetype: { type: Schema.Types.ObjectId, ref: 'Devicetype' },
+  device: { type: Schema.Types.ObjectId, ref: 'Device' },
+  orderNumber: { type: String },
+  isParalyzing: { type: Boolean, required: true },
+  status: { type: Number },
   comments: { type: String },
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 })

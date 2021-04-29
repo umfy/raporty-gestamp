@@ -1,17 +1,17 @@
 extends layout
 
 block content
-   div(class="col-sm-7 my-5")
+    div(class="col mx-md-5 my-5")
       h1 #{title}
 
       p.h4.pt-3  Nazwa: #{devicetype.name}
 
 
   
-   div(class="col-lg-2 my-5")
-        a(href=devicetype.url + '/delete') Usuń 
-        p
-        a(href=devicetype.url + '/update') Zmodyfikuj 
+
+      a.btn.btn-primary.my-5.mr-2(href=devicetype.url + '/delete') Usuń 
+
+      a.btn.btn-primary.my-5.mr-2(href=devicetype.url + '/update') Zmodyfikuj 
 
   
 

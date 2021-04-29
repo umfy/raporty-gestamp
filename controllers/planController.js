@@ -1,20 +1,21 @@
 const Plan = require('../models/plan')
+const Masterplan = require('../models/masterplan')
 const User = require('../models/user')
+const Raport = require('../models/raport')
 
 const async = require('async')
 const { body, validationResult } = require('express-validator')
 
 // Display list of all plans.
 exports.plan_list = function (req, res, next) {
-  Plan.find()
+  Masterplan.find()
     .sort([['date_execution', 'descending']])
     .exec(function (err, list_plans) {
       if (err) {
         return next(err)
       }
       res.render('plan_list', {
-        title: 'Lista prac planowanych',
-        plan_list: list_plans,
+        masterplan_list: list_plans,
       })
     })
 }
@@ -42,8 +43,7 @@ exports.plan_create_get = function (req, res, next) {
     if (err) {
       return next(err)
     }
-    res.render('plan_form', {
-      title: 'Zaplanuj pracę',
+    res.render('masterplan_form', {
       user_list: users,
       shift_names: ['Poranna', 'Popołudniowa', 'Nocna'],
     })
@@ -61,11 +61,12 @@ exports.plan_create_post = [
 
   (req, res, next) => {
     const errors = validationResult(req)
-
+    let dateExecution = new Date(req.body.date_execution)
+    dateExecution.setHours(6, 0, 0, 0)
     let plan = new Plan({
       desc: req.body.desc,
       date_created: new Date(),
-      date_execution: req.body.date_execution,
+      date_execution: dateExecution,
       shift: req.body.shift,
       isDone: false,
       comments: req.body.comments,
@@ -92,6 +93,24 @@ exports.plan_create_post = [
         if (err) {
           return next(err)
         }
+        exe0 = new Date(req.body.date_execution)
+        exe24 = new Date(req.body.date_execution)
+        exe0.setHours(6, 0, 0, 0)
+        exe24.setHours(29, 59, 0, 0)
+
+        Raport.findOneAndUpdate(
+          {
+            date: dateExecution,
+            shift: req.body.shift,
+          },
+          { $push: { masterplan: plan._id } }
+        ).exec(function (err, theraport) {
+          if (err) {
+            return next(err)
+          }
+          console.log('i found one and updated:', theraport)
+        })
+
         res.redirect(plan.url)
       })
     }
@@ -204,11 +223,12 @@ exports.plan_update_post = [
 
   (req, res, next) => {
     const errors = validationResult(req)
-
+    let dateExecution = new Date(req.body.date_execution)
+    dateExecution.setHours(12, 0, 0, 0)
     let plan = new Plan({
       desc: req.body.desc,
       date_created: new Date(),
-      date_execution: req.body.date_execution,
+      date_execution: dateExecution,
       shift: req.body.shift,
       isDone: false,
       comments: req.body.comments,

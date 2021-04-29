@@ -1,25 +1,25 @@
 extends layout
 
 block content
-   div(class="col-md-7 my-5 text-body")
-      h1.text-center.mb-5= title
+   
+   div(class="col my-5 mx-md-5 text-body")
+      h1.text-center.my-5 Lista prac planowanych
 
+      a.btn.btn-primary.my-2(href="/api/plan/create") Utwórz nową pracę planowaną
       table.table.table-bordered.table-striped.table-hover.dark-header-hover
          thead.table-dark
             tr
-               th(scope='col') Opis
+               th(scope='col') Tytuł
                th(scope='col') Data utworzenia
-               th(scope='col') Data egzekucji
+               th(scope='col') Wielkość
          tbody
-            each plan in plan_list
+            each plan in masterplan_list
                tr
                   td.padding0
-                     a(class=(plan.isDone === true ? 'green-link' : 'red-link') href=plan.url) #{plan.desc}
+                     a.black-link(href=plan.url) #{plan.title}
                   td.padding0
-                     a.black-link(href=plan.url) #{plan.virtual_date_created}
+                     a.black-link(href=plan.url) #{plan.date}
                   td.padding0 
-                     a(class=(plan.date_execution < new Date() ? (plan.isDone ? 'green-link' : 'red-link') : 'black-link') href=plan.url) #{plan.virtual_date_execution}
+                     a.black-link(href=plan.url) 10 k
             else
                li There are no lines.
-   div(class="col-lg-2 py-5")
-      a(href="/api/plan/create") Utwórz nową pracę planowaną

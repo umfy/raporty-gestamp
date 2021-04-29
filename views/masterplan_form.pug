@@ -1,0 +1,46 @@
+extends layout
+block content
+   div(class="col mx-md-5 my-5")
+      h1.my-5 Zaplanuj pracę
+      form(method='POST' action='')
+         div.form-group
+            div(class='row')
+               div.col.my-2
+                  label(for='desc') Tytuł:
+                  input#title.form-control(type='text', name='desc', value=(undefined===plan ? '' : plan.desc))
+            div(class='row')
+               div.col.my-2
+                  label(for='user') Zlecający:
+                  select#user.form-control(type='select', placeholder='Wybierz autora' name='user' )
+                     for user in user_list
+                        if plan
+                           option(value=user._id selected=(user._id.toString()===plan.user._id.toString() ? 'selected' : false )) #{user.fullname}
+                        else
+                           option(value=user._id) #{user.fullname}
+
+            div(class='row')
+               div.col.my-2
+                  table.table.table-bordered(id='plans')
+                     thead.table-dark
+                        tr
+                           th.text-center Plany dzienne
+                     tbody
+                        tr
+                           td
+                              button(class="btn btn-danger" type='button' id="addPlanButton") Dodaj
+
+         button.btn.btn-primary(type='button' id='postMasterplanButton') Zapisz
+
+
+      if errors
+         ul
+            for error in errors
+               li!=error.msg
+
+
+   script.
+      $(document).ready(function() {
+         $("#postMasterplanButton").click(function(){
+            $.post("", { shit: 'shit' })
+         })
+      })

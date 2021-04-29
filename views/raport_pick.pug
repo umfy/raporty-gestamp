@@ -1,13 +1,13 @@
 extends layout
 block content
-   div(class='col')
+   div(class='col mx-md-5')
       div(class='row')
-         div(class='col h2 mr-5 d-flex justify-content-center umfy-clock')
+         div(class='col h2 d-flex justify-content-center umfy-clock')
             div(id="clock" class="clock") #{new Date()}
 
             //iframe(src="https://free.timeanddate.com/clock/i7rdaqor/n591/tlpl31/fn13/fs48/tt0/tw0/tm3/tb4" frameborder="0" width="248" height="112")
       div(class='row ')
-         div(class='col mr-5 d-flex justify-content-center') Edytuj raport dla zmiany o numerze:
+         div(class='col d-flex justify-content-center') Edytuj raport dla zmiany o numerze:
 
       div(class='row pb-5')
          div(class='col pt-4 d-flex justify-content-center')
@@ -56,7 +56,7 @@ block content
                      td
                         a.btn.btn-link(href=('/api/raport/'+raportToday[3]) class=(raportToday[3] === undefined ? 'disabled' : '')) Wyświetl raport dla zmiany nocnej 
          
-         div.umfy-margin-right(class='col pt-4 d-flex justify-content-center')
+         div(class='col pt-4 d-flex justify-content-center')
             table.table
                thead.table-dark
                   tr

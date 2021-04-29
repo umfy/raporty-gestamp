@@ -8,6 +8,7 @@ const user_controller = require('../controllers/userController')
 const device_controller = require('../controllers/deviceController')
 const devicetype_controller = require('../controllers/devicetypeController')
 const line_controller = require('../controllers/lineController')
+const operation_controller = require('../controllers/operationController')
 
 /// DEVICE ROUTES ///
 
@@ -98,6 +99,30 @@ router.get('/line', line_controller.line_list)
 
 // GET request for one device item
 router.get('/line/:id', line_controller.line_detail)
+
+// GET request for creating new line
+router.get('/operation/create', operation_controller.operation_create_get)
+
+// POST request for creating new operation
+router.post('/operation/create', operation_controller.operation_create_post)
+
+// GET request to delete operation
+router.get('/operation/:id/delete', operation_controller.operation_delete_get)
+
+// POST request to delete operation
+router.post('/operation/:id/delete', operation_controller.operation_delete_post)
+
+// GET request to update operation
+router.get('/operation/:id/update', operation_controller.operation_update_get)
+
+// POST request to update operation
+router.post('/operation/:id/update', operation_controller.operation_update_post)
+
+// GET request for list of all device items
+router.get('/operation', operation_controller.operation_list)
+
+// GET request for one device item
+router.get('/operation/:id', operation_controller.operation_detail)
 
 /// PLAN-OWANE PRACE ROUTES ///
 

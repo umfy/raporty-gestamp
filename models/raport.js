@@ -9,7 +9,7 @@ const RaportSchema = new Schema({
   additional: { type: String },
   usersPresent: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   usersMissing: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  plan: [{ type: Schema.Types.ObjectId, ref: 'Plan' }],
+  masterplan: [{ type: Schema.Types.ObjectId, ref: 'Masterplan' }],
   inspection: {
     type: Schema.Types.ObjectId,
     ref: 'Inspection',

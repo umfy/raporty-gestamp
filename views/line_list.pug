@@ -1,9 +1,10 @@
 extends layout
 
 block content
-   div(class="col my-5")
+   div(class="col mx-md-5 my-5")
       h1.text-center.mb-5= title
 
+      a.btn.btn-primary.my-2(href="/api/line/create") Utwórz Linię
       table.table.table-bordered.table-striped.table-hover.dark-header-hover
          thead.table-dark
             tr
@@ -15,6 +16,3 @@ block content
                      a.black-link(href=line.url) #{line.name}
             else
                li.list-group-item Brak linii.
-
-   div(class="col-lg-2 my-5")
-      a(href="/api/line/create") Utwórz Linię
