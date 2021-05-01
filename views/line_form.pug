@@ -1,16 +1,16 @@
 extends layout
 
 block content
+   div(class="col mx-md-5 my-5")
+      h1 #{title}
 
-   h1 #{title}
+      form(method='POST' action='')
+         div.form-group
+            label(for='name') Nazwa linii:
+            input#name.form-control(type='text', placehoder='ASS1, ASS2 etc.' name='name', value=(undefined===line ? '' : line.name))
+         button.btn.btn-primary(type='submit') Zapisz
 
-   form(method='POST' action='')
-      div.form-group
-         label(for='name') Nazwa linii:
-         input#name.form-control(type='text', placehoder='ASS1, ASS2 etc.' name='name', value=(undefined===line ? '' : line.name))
-      button.btn.btn-primary(type='submit') Submit
-
-   if errors
-      ul
-         for error in errors
-            li!=error.msg
+      if errors
+         ul
+            for error in errors
+               li!=error.msg

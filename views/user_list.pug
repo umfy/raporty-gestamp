@@ -1,11 +1,24 @@
 extends layout
 
 block content
-   h1= title
+   div(class="col mx-md-5 my-5")
+      h1.text-center.mb-5= title
 
-   ul 
-      each user in user_list
-         li
-            a(href=user.url) #{user.name}
-      else
-         li There are no users.
+      a.btn.btn-primary.my-2(href="/api/user/create") Dodaj Pracownika
+      table.table.table-bordered.table-striped.table-hover.dark-header-hover
+         thead.table-dark
+            tr
+               th Imię
+               th Nazwisko
+               th Specjalizacja
+         tbody 
+            each user in user_list
+               tr
+                  td.padding0
+                     a.black-link(href=user.url) #{user.name}
+                  td.padding0
+                     a.black-link(href=user.url) #{user.surname}
+                  td.padding0
+                     a.black-link(href=user.url) #{user.spec}
+            else
+               li There are no users.

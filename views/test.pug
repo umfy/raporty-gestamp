@@ -1,0 +1,19 @@
+extends layout
+
+block content
+   script.
+      $(document).ready(function(){
+        $("#button").click(function(){
+           console.log('click!')
+           let it = !{JSON.stringify(raport_list)}
+           console.log(it)
+           let ti = !{JSON.stringify(raport_list)};
+           console.log(ti[0])
+        })
+      })
+   h1 czy się udało?
+
+   div  message: Madzia pyta o Ciebie!
+     button(class="btn btn-danger my-4" type='button' id="button") Dodaj    
+          
+

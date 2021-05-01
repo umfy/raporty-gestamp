@@ -1,20 +1,17 @@
 extends layout
 
 block content
+   div(class="col mx-md-5 my-5")
+      h1 #{title}
 
-   h1 #{title}
-
-   p #[strong Nazwa:] #{device.name}
-   p #[strong Ip:] #{device.ip}
-   p #[strong Linia:] #{device.line.name}
-   p #[strong Typ urządzenia:] #{device.devicetype.name}
-   p #[strong Opis:] #{device.desc}
-
-
-    hr
-    p 
-    a(href=device.url + '/delete') Usuń Urządzenie
-    p
-    a(href=device.url+'/update') Zmodyfikuj Urządzenie
+      p #[strong Nazwa:] #{device.name}
+      p #[strong Ip:] #{device.ip}
+      p #[strong Linia:] #{device.line.name}
+      p #[strong Typ urządzenia:] #{device.devicetype.name}
+      p #[strong Opis:] #{device.desc}
+     
+      a.btn.btn-primary.my-5.mr-2(href=device.url + '/delete') Usuń 
+      a.btn.btn-primary.my-5.mr-2(href=device.url + '/update') Zmodyfikuj 
 
   
+

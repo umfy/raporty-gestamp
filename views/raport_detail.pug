@@ -1,0 +1,128 @@
+extends layout
+block content  
+  script.
+    $(document).ready(function(){
+      $("#downloadPDF").click(function(){
+        $.post("")
+      })
+    })
+  div(class='col')
+    div(class='row')
+      div(class='col mx-md-5 mt-4')
+        h1.mt-5.text-center #{raport.virtual_date} 
+        h2.text-center Zmiana #{(raport.shift === 1 ? '1 – Poranna' : (raport.shift === 2? '2 – Popołudniowa' : '3 – Nocna'))}
+        p.h4.my-4.text-center Dziennik zdarzeń oraz działania podjęte przez dział Utrzymania Ruchu
+
+        a.btn.btn-primary.my-5.mr-2(href='/api/raport/'+ raport._id +'/download' target="_blank") Pobierz PDF
+          
+        a.btn.btn-primary.my-5.mr-2(href=raport.url+'/delete') Usuń 
+          
+        a.btn.btn-primary.my-5.mr-2(href='/api/raport/create/'+raport._id) Zmodyfikuj    
+        table(class='table table-bordered')
+          caption Skład zmiany
+            thead
+              tr
+                th(scope="col") Imię
+                th(scope="col") Nazwisko
+                th(scope="col") Specjalizacja
+                th(width="13%" scope="col") Obecność
+            tbody
+              // in the route when 'raport' is created, presence is not passed as an argument so it's undefined
+              // checks on length prevent iterations over empty list AND if the presence is not saved for the first time, basic form generates
+              if (raport.usersPresent.length != 0)
+                each user in raport.usersPresent
+                  tr
+                    td #{user.name}
+                    td #{user.surname}
+                    td #{user.spec}
+                    td
+                      button.btn.btn-success.umfy-btn(disabled) TAK                
+              if (raport.usersMissing.length != 0)
+                each user in raport.usersMissing
+                  tr
+                    td #{user.name}
+                    td #{user.surname}
+                    td #{user.spec}
+                    td
+                      button.btn.btn-danger.umfy-btn(disabled) NIE
+
+        table(class="table table-bordered") 
+          caption Obchód
+          thead 
+            tr 
+              th(width="20%" scope="col") Miejsce
+              th(scope="col") Komentarz
+              th(width="13%" scope="col") Stan
+          tbody
+            each place in inspectionPlaces
+              tr
+                td #{place[2]}
+                td #{raport.inspection[place[0]]}
+                td 
+                  button.btn.umfy-btn(class=(raport.inspection[place[1]] === true ? 'btn-success' : 'btn-danger') disabled) #{(raport.inspection[place[1]] === true ? 'OK ' : 'NOK')}
+        
+        
+        table(class='table table-bordered') 
+          caption Prace Planowane
+          thead 
+            tr
+              th(scope="col") Opis
+              th(scope="col") Komentarz
+              th(width="13%" scope="col") Stan
+          tbody
+            each item in raport.plan
+              tr
+                td #{item.desc}
+                td #{item.comments}
+                td 
+                  button.btn.umfy-btn(class=(item.isDone === true ? 'btn-success' : 'btn-danger') disabled) #{(item.isDone=== true ? 'OK ' : 'NOK')}
+
+
+        table(class='table table-bordered')
+          caption Dodatkowe informacje
+          tbody
+            td.p-1.pb-5 #{raport.additional}
+
+
+        each breakdown in raport.breakdown
+          table(class='my-5 table table-bordered')
+            caption.h5 Awaria #{(breakdown._id)}
+            thead
+              tr(class=(breakdown.status === 1 ? 'table-success' : (breakdown.status === 2 ? 'table-danger' : 'table-warning')))
+                th(width="20%" class='text-center' scope='col') Status:
+                th.text-center(scope='col') #{(breakdown.status === 1 ? 'Naprawiono' : (breakdown.status === 2 ? 'Nie naprawiono' : 'Działanie Tymczasowe'))}
+            tbody
+              tr.umfy-table-separator
+                td Czas trwania awarii: 
+                td #{breakdown.full_duration}
+              tr
+                td Linia 
+                td #{breakdown.line.name}
+              tr
+                td Typ
+                td #{breakdown.devicetype.name}
+              tr.umfy-table-separator
+                td Urządzenie
+                td #{breakdown.device.name}
+              tr
+                td Diagnostyka 
+                td #{breakdown.diagnostics}
+              tr.umfy-table-separator
+                td Działanie 
+                td #{breakdown.treatment}
+              tr
+                td Numer zlecenia 
+                td #{breakdown.orderNumber}
+              tr
+                td Użyte części
+                td #{breakdown.partsUsed}
+              tr
+                td Części do zamówienia 
+                td #{breakdown.partsToOrder}
+              tr.umfy-table-separator
+                td Prace na postój 
+                td #{breakdown.plannedAction}
+ 
+
+
+

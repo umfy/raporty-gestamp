@@ -1,27 +1,26 @@
 extends layout
 
 block content
-  h1 #{title}: #{user.fullname}
+  div(class="col mx-md-5 my-5")
+    h1 #{title}: #{user.fullname}
 
-  if user_plans.length
+    if user_plans.length
 
-    p #[strong Usuń poniższe plany przed usunięciem użytkownika:]
+      p.h4.pt-3 Usuń poniższe plany przed usunięciem użytkownika:
 
-    div(style='margin-left:20px;margin-top:20px')
+      div(style='margin-left:20px;margin-top:20px')
 
-      h4 Plany:
+        dl
+        each plan in user_plans
+          dt
+            a(href=plan.url) #{plan.date_created}
+          dd #{plan.desc}
 
-      dl
-      each plan in user_plans
-        dt
-          a(href=plan.url) #{plan.date_created}
-        dd #{plan.desc}
+    else
+      p Czy na pewno chcesz usunąć tego użytkownika?
 
-  else
-    p Do you really want to delete this user?
+      form(method='POST' action='')
+        div.form-group
+          input#userid.form-control(type='hidden',name='userid', required='true', value=user._id )
 
-    form(method='POST' action='')
-      div.form-group
-        input#userid.form-control(type='hidden',name='userid', required='true', value=user._id )
-
-      button.btn.btn-primary(type='submit') Delete
+        button.btn.btn-danger(type='submit') Delete

@@ -9,9 +9,12 @@ const apiRouter = require('./routes/api')
 
 //Set up mongoose connection
 const mongoose = require('mongoose')
+// Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
+// by default, you need to set it to false.
+mongoose.set('useFindAndModify', false)
 //const mongoDB = 'mongodb://localhost:27017/rapo1'
 const mongoDB =
-   'mongodb+srv://admin:lkjo@gestamp-raport-cluster.rldl0.mongodb.net/gestamp-raport-db?retryWrites=true&w=majority'
+  'mongodb+srv://admin:lkjo@gestamp-raport-cluster.rldl0.mongodb.net/gestamp-raport-db?retryWrites=true&w=majority'
 
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true })
 const db = mongoose.connection
@@ -34,18 +37,18 @@ app.use('/api', apiRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-   next(createError(404))
+  next(createError(404))
 })
 
 // error handler
 app.use(function (err, req, res, next) {
-   // set locals, only providing error in development
-   res.locals.message = err.message
-   res.locals.error = req.app.get('env') === 'development' ? err : {}
+  // set locals, only providing error in development
+  res.locals.message = err.message
+  res.locals.error = req.app.get('env') === 'development' ? err : {}
 
-   // render the error page
-   res.status(err.status || 500)
-   res.render('error')
+  // render the error page
+  res.status(err.status || 500)
+  res.render('error')
 })
 
 module.exports = app

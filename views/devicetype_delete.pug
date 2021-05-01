@@ -1,27 +1,26 @@
 extends layout
 
 block content
-  h1 #{title}: #{devicetype.name}
+  div(class="col mx-md-5 my-5")
+    h1 #{title}: #{devicetype.name}
 
-  if devicetype_devices.length
+    if devicetype_devices.length
 
-    p #[strong Usuń poniższe urządzenia przed usunięciem linii:]
+      p.h4.pt-3 Usuń poniższe urządzenia przed usunięciem typu:
 
-    div(style='margin-left:20px;margin-top:20px')
+      div(style='margin-left:20px;margin-top:20px')
 
-      h4 Urządzenia:
+        dl
+        each device in devicetype_devices
+          dt
+            a(href=device.url) #{device.name}
+            dd #{device.desc}
 
-      dl
-      each device in devicetype_devices
-        dt
-          a(href=device.url) #{device.name}
-        dd #{device.desc}
+    else
+      p Czy na pewno chcesz usunąć to urządzenie?
 
-  else
-    p Do you really want to delete this devicetype?
+      form(method='POST' action='')
+        div.form-group
+          input#devicetypeid.form-control(type='hidden',name='devicetypeid', required='true', value=devicetype._id )
 
-    form(method='POST' action='')
-      div.form-group
-        input#devicetypeid.form-control(type='hidden',name='devicetypeid', required='true', value=devicetype._id )
-
-      button.btn.btn-primary(type='submit') Delete
+        button.btn.btn-danger(type='submit') Usuń

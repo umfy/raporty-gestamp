@@ -1,0 +1,601 @@
+extends layout
+block content
+  // main display
+  div(class='col mx-md-5')
+    div(class='row')
+      div(class='col-lg-4 py-4')
+        table(class='table table-bordered table-umfy')
+          caption Skład zmiany
+          thead.table-dark
+            tr
+              th(scope="col") Imię
+              th(scope="col") Nazwisko
+              th(scope="col") Specjalizacja
+              th(scope="col") Obecny
+          tbody
+            // in the route when 'raport' is created, presence is not passed as an argument so it's undefined
+            // checks on length prevent iterations over empty list AND if the presence is not saved for the first time, basic form generates
+
+            if (raport.usersPresent.length != 0)
+              each user in raport.usersPresent
+                tr
+                  td #{user.name}
+                  td #{user.surname}
+                  td #{user.spec}
+                  td
+                    div(class='form-check') 
+                      input(class="form-check-input presenceInput" type="checkbox" name=user._id value=1 id=user._id checked=true)
+            if (raport.usersMissing.length != 0)
+              each user in raport.usersMissing
+                tr
+                  td #{user.name}
+                  td #{user.surname}
+                  td #{user.spec}
+                  td
+                    div(class='form-check') 
+                      input(class="form-check-input presenceInput" type="checkbox" name=user._id value=1 id=user._id checked=false)
+
+
+        div.float-right
+          button(class="btn btn-primary mb-2" type='button' id='postPresenceButton' data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz          
+
+        table(class="table table-bordered table-umfy") 
+          caption Obchód
+          thead.table-dark
+            tr 
+              th(scope="col") Miejsce
+              th(scope="col") Komentarz
+              th(scope="col") Stan
+          tbody
+            each place in inspectionPlaces
+              tr
+                td #{place[2]}
+                td 
+                  input(class="form-control placesInput" type="text" id=place[0] value=raport.inspection[place[0]])
+                td
+                  div(class='form-check') 
+                    input(class="form-check-input placesInput" type="checkbox" id=place[1] value=1 checked=raport.inspection[place[1]])
+        div.float-right
+          button(class="btn btn-primary mb-2" type='button' id="postPlacesButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
+
+        table(class='table table-bordered table-umfy') 
+          caption Prace Planowane
+          thead.table-dark
+            tr
+              th Opis
+              th Komentarz
+              th Stan
+          //- tbody
+          //-   each item in raport.plan
+          //-     tr
+          //-       td #{item.desc}
+          //-       td
+          //-         input(class="form-control planInput" class=("_" + item._id) type="text" value=item.comments)
+          //-         // if css class begins with number you have to transform it into unicode like so:
+          //-         // class='12'; document.querySelectorAll("input.form-control.\\31\\32")
+          //-         // https://mathiasbynens.be/notes/css-escapes
+          //-         // it's easier to add a non-numeric character at the begining of a class name
+          //-       td
+          //-         div(class='form-check') 
+          //-           input(class="form-check-input planInput" class='_'+item._id type="checkbox" value=1 checked=item.isDone)
+
+
+        div.float-right
+          button(class="btn btn-primary mb-2 " type='button' id="postPlanButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz          
+
+
+        div(class="form-group")
+          // table and caption just to be consistant with the layout
+          table(class='table umfy-ghost-table')
+            caption Dodatkowe informacje
+          textarea(class="form-control additionalTextarea mt-1" rows=10 type="text") #{raport.additional}
+        div.float-right
+          button(class="btn btn-primary" type='button'  id="postAdditionalButton" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!") Zapisz    
+
+      // --- --- --- AWARIE --- --- ---
+      div(class='col-lg-8 py-4') 
+        h2 Awarie
+
+        // breakdowns from DB:
+        div(class='accordion')
+          each breakdown in raport.breakdown
+            .card
+              .card-header
+                h5.mb-0
+                  // I added _ because I want other Div to have 'breakdown._id' as id.
+                  button.btn.btn-link(data-toggle='collapse' data-target=('#_'+breakdown._id) aria-expanded='true' aria-controls='collapseOne')
+                    | Awaria:  #{breakdown.diagnostics}
+              .collapse(data-parent='#accordion' id='_'+breakdown._id)
+                .card-body.umfy-card-body
+                  .col.bg-danger.text-light(id=breakdown._id)
+                    .row
+                      .col
+                        .form-group.mt-2
+                          label  Numer zlecenia 
+                          input.form-control.orderNumber(class=("BreakdownB_"+breakdown._id) type='text' value=breakdown.orderNumber)
+                    .row
+                      .col
+                        select.form-control.line(class=("BreakdownB_"+breakdown._id))
+                          each item in lineList
+                            option( value=item._id selected=(breakdown.line._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
+                      .col
+                        select.form-control.devicetype(class=("BreakdownB_"+breakdown._id))
+                          each item in devicetypeList
+                            option( value=item._id selected=(breakdown.devicetype._id.toString()===item._id.toString() ? 'selected' : false))  #{item.name}
+                      .col
+                        select.form-control.device(class=("BreakdownB_"+breakdown._id))
+                          each item in deviceList
+                            option( value=item._id selected=(breakdown.device._id.toString()===item._id.toString() ? 'selected' : false)) #{item.name}
+                    .row.mt-3
+                      .col
+                        label(for='appt')  Godzina rozpoczęcia awarii
+                        - var nDB = new Date(breakdown.dateBegin)
+                        // slice makes sure the format includes 0 in (12:01) for example
+                        input#appt.dateBegin(class=("BreakdownB_"+breakdown._id) type='time' name='appt' value=(("0" + nDB.getHours()).slice(-2)+':'+("0" + nDB.getMinutes()).slice(-2)))
+                      .col
+                        label(for='appt-end')  Godzina zakończenia awarii 
+                        - var nDE = new Date(breakdown.dateEnd)
+                        input#appt-end.dateEnd(class=("BreakdownB_"+breakdown._id) type='time' name='appt-end' value=(("0" + nDE.getHours()).slice(-2)+':'+("0" + nDE.getMinutes()).slice(-2)))
+                    .row
+                      .col.mt-3
+                        | Diagnostyka
+                        textarea.form-control.diagnostics(class=("BreakdownB_"+breakdown._id) rows='2' type='text') #{breakdown.diagnostics}
+                    .row
+                      .col.mt-3
+                        | Działanie
+                        textarea.form-control.treatment(class=("BreakdownB_"+breakdown._id) rows='2' type='text') #{breakdown.treatment}
+                    .row.mt-2
+                      .col.d-flex.justify-content-between
+                        .form-check.form-check-inline
+                          input.form-check-input.statusRepaired(type='radio' id=('inlineRadio1'+breakdown._id) name='inlineRadioOptions' value='1' checked=(breakdown.status===1 ? true : false))
+                          label.form-check-label(for='inlineRadio1'+breakdown._id)  Naprawiono 
+                        .form-check.form-check-inline
+                          input.form-check-input.statusNotRepaired(type='radio' id=('inlineRadio2'+breakdown._id) name='inlineRadioOptions' value='2' checked=(breakdown.status===2 ? true : false))
+                          label.form-check-label(for='inlineRadio2'+breakdown._id)  Nie naprawiono 
+                        .form-check.form-check-inline
+                          input.form-check-input.statusTemporary(type='radio' id=('inlineRadio3'+breakdown._id) name='inlineRadioOptions' value='3' checked=(breakdown.status===3 ? true : false))
+                          label.form-check-label(for='inlineRadio3'+breakdown._id)  Rozwiązanie tymczasowe 
+                    .row
+                      .col.mt-3
+                        | Uzyte części
+                        textarea.form-control.partsUsed(class=("BreakdownB_"+breakdown._id) rows='1' type='text') #{breakdown.partsUsed}
+                    .row
+                      .col.mt-3
+                        | Części do zamówienia
+                        textarea.form-control.partsToOrder(class=("BreakdownB_"+breakdown._id) rows='1' type='text') #{breakdown.partsToOrder}
+                    .row
+                      .col.mt-3
+                        | Prace na postój
+                        textarea.form-control.plannedAction(class=("BreakdownB_"+breakdown._id) rows='1' type='text') #{breakdown.plannedAction}
+                    .row
+                      .col.mb-3
+                        button.btn.btn-primary.mt-3.float-right(class="updateBreakdownButton" type="button" id=("B_"+breakdown._id) onclick="addBreakdown(this)" data-toggle="popover" data-placement="left" data-trigger="focus" data-content="Zapisano!")  Zapisz 
+          
+
+        // Add Breakdown Button
+        div 
+          button(class="btn btn-danger my-4" type='button' id="addBreakdownButton") Dodaj    
+        div(id='breakdown' title="")
+
+  script.
+    $(document).ready(function(){
+      // https://stackoverflow.com/a/48238659/13527337
+      "use strict";
+      (() => {
+      const modified_inputs = new Set;
+      const defaultValue = "defaultValue";
+      const original_checked = new Set;
+      //const original_radio = new Set;
+      // store default values
+      addEventListener("beforeinput", (evt) => {
+          const target = evt.target;
+          if (!(defaultValue in target || defaultValue in target.dataset)) {
+              target.dataset[defaultValue] = ("" + (target.value || target.textContent)).trim();
+          }
+      });
+        // save all checked values in 'original_checked'
+        let checkboxes = $("input[type=checkbox]")
+        let enabledSettings = [];
+        // Attach a change event handler to the checkboxes.
+          enabledSettings = checkboxes
+            .filter(":checked") // Filter out unchecked boxes.
+            .map(function() { // Extract values using jQuery map.
+              return this
+            }) 
+            .get() // Get array.
+          enabledSettings.forEach(item => original_checked.add(item))
+
+          //- // radio?
+          //- let radios = $("input[type=radio]")
+          //- let enabledRadioSettings = [];
+          //- // Attach a change event handler to the radios.
+          //-   enabledRadioSettings = radios
+          //-     .filter(":checked") // Filter out unchecked boxes.
+          //-     .map(function() { // Extract values using jQuery map.
+          //-       return this
+          //-     }) 
+          //-     .get() // Get array.
+          //-   enabledRadioSettings.forEach(item => original_radio.add(item))
+
+      
+      // detect input modifications
+      addEventListener("input", (evt) => {
+          const target = evt.target;
+          let original;
+          //console.log(target.type)
+          // TARGET TYPE TEXT
+          if (target.type === 'text' || target.type === 'textarea' || target.type === 'select-one' || target.type === 'time') {
+            if (defaultValue in target) {
+              // target[defaultValue] is target's initial value
+                original = target[defaultValue];
+            } else {
+              console.log('target.dataset[defaultValue]',target.dataset[defaultValue])
+                original = target.dataset[defaultValue];
+            }
+            if (original !== ("" + (target.value || target.textContent)).trim()) {
+              // if content of target is different than it's initial value
+                if (!modified_inputs.has(target)) {
+                    modified_inputs.add(target);
+                    target.style.color = 'tomato'
+                }
+            } else if (modified_inputs.has(target)) {
+              // if content of target is identical to original, delete it from the set
+                modified_inputs.delete(target);
+                console.log('deleting', target)
+                target.style.color = 'black'
+            }
+            console.log(modified_inputs)
+          }
+          // TARGET TYPE CHECKBOX
+          if (target.type === 'checkbox'){
+            if (target.checked === true){
+            if (!original_checked.has(target)){
+              modified_inputs.add(target)
+              target.style.outline = '1px solid tomato'
+            } else {
+              modified_inputs.delete(target)
+              target.style.outline = '0px'
+            }
+          }
+          if (target.checked === false){
+            if (original_checked.has(target)){
+              modified_inputs.add(target)
+              target.style.outline = '1px solid tomato'
+            } else {
+              modified_inputs.delete(target)
+              target.style.outline = '0px'
+            }
+          }
+          console.log(modified_inputs)
+          }
+          //- if (target.type === 'radio'){
+          //-   console.log('radio')
+          //- }
+      });
+      // clear modified inputs upon form submission
+      // addEventListener("submit", (evt) => {
+          //modified_inputs.clear();
+          // to prevent the warning from happening, it is advisable
+          // that you clear your form controls back to their default
+          // state with evt.target.reset() or form.reset() after submission
+      //});
+      $("#postPresenceButton").click(function(){
+        let all = document.querySelectorAll("input.presenceInput")
+        for (let i=0; i<all.length; i++){
+          modified_inputs.delete(all[i])
+          all[i].style.outline = '0px'
+        }
+      })
+      $("#postPlacesButton").click(function(){
+        let all = document.querySelectorAll("input.placesInput")
+        for (let i=0; i<all.length; i++){
+          modified_inputs.delete(all[i])
+          all[i].style.color = 'black'
+          all[i].style.outline = '0px'
+        }
+      })
+      $("#postPlanButton").click(function(){
+        let all = document.querySelectorAll("input.planInput")
+        for (let i=0; i<all.length; i++){
+          modified_inputs.delete(all[i])
+          all[i].style.color = 'black'
+          all[i].style.outline = '0px'
+        }
+      })
+      $("#postAdditionalButton").click(function(){
+        let textbox = document.querySelector("textarea.form-control.additionalTextarea")
+        modified_inputs.delete(textbox)
+        textbox.style.color = 'black'
+      })
+      $(".updateBreakdownButton").click(function(){
+        let all = document.querySelectorAll(".Breakdown"+this.id)
+        for (let i=0; i<all.length; i++){
+          modified_inputs.delete(all[i])
+          all[i].style.color = 'black'
+        }
+      })
+      // here goes create button
+      $( "#breakdown" ).click(function(e, data) {
+        // #breakdown is invissible div that you can't really click
+        let all = document.querySelectorAll('.'+data.tempId)
+        for (let i=0; i<all.length; i++){
+          modified_inputs.delete(all[i])
+          all[i].style.color = 'black'
+        }
+      });
+ 
+      // warn before closing if any inputs are modified
+      addEventListener("beforeunload", (evt) => {
+          if (modified_inputs.size) {
+              const unsaved_changes_warning = "Changes you made may not be saved.";
+              evt.returnValue = unsaved_changes_warning;
+              return unsaved_changes_warning;
+          }
+      });
+      })();
+    })
+
+  script.
+    // enable popovers
+    $(document).ready(function(){
+      $(function () {
+        $('[data-toggle="popover"]').popover()
+      })
+    })
+  script.
+    $(document).ready(function(){
+      $("#addBreakdownButton").click(function(){
+        let temporaryId = document.querySelector('#breakdown').title + 'I'
+        // Liczby Tarrota 
+        if (temporaryId.slice(-5) === 'IIIII'){
+           temporaryId = temporaryId.replace('IIIII', 'V')
+        }
+        if (temporaryId.slice(-2) === 'VV'){
+          temporaryId = temporaryId.replace('VV', 'X')
+        }
+        if (temporaryId.slice(-5) === 'XXXXX'){
+          temporaryId = temporaryId.replace('XXXXX', 'L')
+        }
+        document.querySelector('#breakdown').title = temporaryId
+        let lines = !{JSON.stringify(lineList)}
+        let devicetypes = !{JSON.stringify(devicetypeList)}
+        let devices = !{JSON.stringify(deviceList)}
+        let lineList = ''
+        let devicetypeList = ''
+        let deviceList = ''
+        for (let i=0; i<lines.length;i++) {
+        lineList = lineList + '<option value=' + lines[i]._id + '>' + lines[i].name + '</option>'
+        }
+        for (let i=0; i<devicetypes.length;i++) {
+        devicetypeList = devicetypeList + '<option value=' + devicetypes[i]._id + '>' + devicetypes[i].name + '</option>'
+        }
+        for (let i=0; i<devices.length;i++) {
+        deviceList = deviceList + '<option value=' + devices[i]._id + '>' + devices[i].name + '</option>'
+        }
+        $('#breakdown').after(`
+        <div class="accordion">
+          <div class="card">
+            <div class="card-header" id="AddBreakdownHeading">
+              <h2 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#`+temporaryId+`" aria-expanded="true" aria-controls="collapseOne">
+                  Nowa awaria `+ temporaryId +`
+                </button>
+              </h2>
+            </div>
+            <div id="`+temporaryId+`" class="collapse show" aria-labelledby="AddBreakdownHeading" data-parent="#accordionExample">
+              <div class="card-body umfy-card-body">
+               
+                <div class="col bg-secondary text-light ">
+                  <div class="row"> 
+                    <div class="col"> 
+                      <div class="form-group mt-2">
+                      <label> Numer zlecenia </label>
+                      <input class="form-control orderNumber `+temporaryId+`" type="text">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col"> 
+                      <select class="form-control line `+temporaryId+`">`
+                      + lineList +
+                      `
+                      </select>
+                    </div>
+                    <div class="col">
+                      <select class="form-control devicetype `+temporaryId+`">`
+                      + devicetypeList +
+                      `
+                      </select>
+                    </div>
+                    <div class="col"> 
+                      <select class="form-control device `+temporaryId+`">`
+                      + deviceList +
+                      `
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row mt-3">
+                    <div class="col">
+                      <label for="appt`+temporaryId+`"> Godzina rozpoczęcia awarii </label>
+                      <input class="dateBegin `+temporaryId+`" type="time" id="appt`+temporaryId+`" name="appt">
+                    </div>
+                    <div class="col">
+                      <label for="appt-end`+temporaryId+`"> Godzina zakończenia awarii </label>
+                      <input class="dateEnd `+temporaryId+`" type="time" id="appt-end`+temporaryId+`" name="appt-end">
+                    </div> 
+                  </div>
+                  <div class="row">
+                    <div class="col mt-3"> Diagnostyka
+                      <textarea class="form-control diagnostics `+temporaryId+`" rows=2 type="text"></textarea>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col mt-3"> Działanie
+                      <textarea class="form-control treatment `+temporaryId+`" rows=2 type="text"></textarea>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col d-flex justify-content-between">
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input statusRepaired `+temporaryId+`" type="radio" name="inlineRadioOptions" id="inlineRadio1`+temporaryId+`" value='1'>
+                        <label class="form-check-label" for="inlineRadio1"> Naprawiono </label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input statusNotRepaired `+temporaryId+`" type="radio" name="inlineRadioOptions" id="inlineRadio2`+temporaryId+`" value='2'>
+                        <label class="form-check-label" for="inlineRadio2"> Nie naprawiono </label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input statusTemporary `+temporaryId+`" type="radio" name="inlineRadioOptions" id="inlineRadio3"`+temporaryId+` value='3'>
+                        <label class="form-check-label" for="inlineRadio3"> Rozwiązanie tymczasowe </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col mt-3"> Uzyte części
+                      <textarea class="form-control partsUsed `+temporaryId+`" rows=1 type="text"></textarea>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col mt-3"> Części do zamówienia
+                      <textarea class="form-control partsToOrder `+temporaryId+`" rows=1 type="text"></textarea>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col mt-3"> Prace na postój
+                      <textarea class="form-control plannedAction `+temporaryId+`" rows=1 type="text"></textarea>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col mb-3">
+                      <button class="btn btn-primary mt-3 float-right saveBreakdownButton" type='button' value=`+temporaryId+` onclick='addBreakdown(this)'> Zapisz </button>       
+                    </div>
+                  </div>
+                </div>
+        
+               </div>
+            </div>
+          </div>
+        </div>
+        `)
+      })
+    })
+  script.
+      function addBreakdown(this_cell){
+        // if this_cell has value it means it's created dynamically via html above. Value is I, II, III...
+        // it triggers invissible div '#breakdown' which is handled in 'beforeunload' script
+        if (this_cell.value){
+          $("#breakdown").trigger('click', [{tempId:this_cell.value}])
+
+        }
+        let raportId = !{JSON.stringify(raport._id)}     
+        let postBreakdown = {}
+        let breakdownDiv = ($(this_cell).parent().parent().parent())
+        let startDate = new Date()
+        let endDate = new(Date)
+        let startTime = (breakdownDiv.find("input.dateBegin")[0].value).split(':')
+        let endTime = (breakdownDiv.find("input.dateEnd")[0].value).split(':')
+        startDate.setHours(startTime[0], startTime[1])
+        endDate.setHours(endTime[0], endTime[1])
+
+        postBreakdown['_id'] = breakdownDiv.attr('id')
+        postBreakdown['orderNumber'] = breakdownDiv.find("input.form-control.orderNumber")[0].value
+        postBreakdown['line'] = breakdownDiv.find("select.line")[0].value
+        postBreakdown['devicetype'] = breakdownDiv.find("select.devicetype")[0].value
+        postBreakdown['device'] = breakdownDiv.find("select.device")[0].value
+        postBreakdown['dateBegin'] = startDate
+        postBreakdown['dateEnd'] = endDate
+        postBreakdown['diagnostics'] = breakdownDiv.find("textarea.diagnostics")[0].value
+        postBreakdown['treatment'] = breakdownDiv.find("textarea.treatment")[0].value
+
+        if (breakdownDiv.find("input.statusRepaired")[0].checked){
+          postBreakdown['status'] = 1
+        }
+        if (breakdownDiv.find("input.statusNotRepaired")[0].checked){
+          postBreakdown['status'] = 2
+        }
+        if (breakdownDiv.find("input.statusTemporary")[0].checked){
+          postBreakdown['status'] = 3
+        }
+
+        postBreakdown['partsUsed'] = breakdownDiv.find("textarea.partsUsed")[0].value
+        postBreakdown['partsToOrder'] = breakdownDiv.find("textarea.partsToOrder")[0].value
+        postBreakdown['plannedAction'] = breakdownDiv.find("textarea.plannedAction")[0].value
+
+        $.post("", {action: "postBreakdown", raportId: raportId, postBreakdown: JSON.stringify(postBreakdown)}, function(data){
+          breakdownDiv.prop('id', data)
+        })
+      }
+  script.
+    $(document).ready(function(){
+      $("#postAdditionalButton").click(function(){
+        let postAdditional = {}
+        postAdditional['_id'] = !{JSON.stringify(raport._id)}
+        postAdditional['additional'] = document.querySelector("textarea.form-control.additionalTextarea").value
+        $.post("", {action: "postAdditional", postAdditional: JSON.stringify(postAdditional)})
+      })
+    })
+  script.
+    $(document).ready(function() {
+      $("#postPlanButton").click(function(){
+        let plans = !{JSON.stringify(raport.plan)}
+
+        let postPlans = []
+        for(let i=0; i<plans.length; i++){
+          let result = {}
+          result['_id'] = plans[i]._id
+          result['comments'] = document.querySelector("input.form-control._" + plans[i]._id).value
+          result['isDone'] = document.querySelector("input.form-check-input._" + plans[i]._id).checked
+
+          postPlans.push(result)
+        }
+        $.post("", {action: 'postPlan', postPlans: JSON.stringify(postPlans)})
+      }); 
+    });
+  script.
+    $(document).ready(function() {
+      $("#postPresenceButton").click(function(){
+        raport = !{JSON.stringify(raport)}
+
+        let missing = raport.usersMissing
+        let present = raport.usersPresent
+
+        let usersMissing = []
+        let usersPresent = []
+
+        for (let i=0; i<missing.length; i++){
+          if (document.getElementById(missing[i]['_id']).checked)
+          {
+            usersPresent.push(missing[i]['_id'])
+          } else {usersMissing.push(missing[i]['_id'])}
+        }
+
+        for (let i=0; i<present.length; i++){
+          if (document.getElementById(present[i]['_id']).checked){
+            usersPresent.push(present[i]['_id'])
+          } else {usersMissing.push(present[i]['_id'])}
+        }
+        $.post("", {action: 'postPresence', usersPresent: JSON.stringify(usersPresent), usersMissing: JSON.stringify(usersMissing), raportId: raport._id})
+      }); 
+    });
+  script.
+    $(document).ready(function() {
+    $("#postPlacesButton").click(function(){
+      let inspectionPlaces = [
+      ['kettle', 'isKettle', 'Kotłownia'],
+      ['compressor', 'isCompressor', 'Kompresownia'],
+      ['ice', 'isIce', 'Wieża Chłodu'],
+      ['electric', 'isElectric', 'Rozdzielnia'],
+      ['workshop', 'isWorkshop', 'Warsztat'], ]
+
+      let inspectionId = !{JSON.stringify(raport.inspection._id)}
+      let postPlaces = {}
+
+      for (let i=0; i<inspectionPlaces.length;i++ ){
+        postPlaces[inspectionPlaces[i][0]] = document.getElementById(inspectionPlaces[i][0]).value
+        postPlaces[inspectionPlaces[i][1]] = document.getElementById(inspectionPlaces[i][1]).checked
+      }
+      $.post("", {action: 'postInspection', postPlaces: JSON.stringify(postPlaces), inspectionId: inspectionId})
+    }); 
+    });
+
+

@@ -1,25 +1,23 @@
 extends layout
 
 block content
+  div(class="col mx-md-5 my-5")
+    h1 #{title}
+    p #[strong Status: ]
+      if plan.isDone
+        span.text-success  Zakończone
+      else
+        span.text-danger  Oczekujące
 
-   h1 #{title}
-   p #[strong Status: ]
-    if plan.isDone
-      span.text-success  Zakończone
-    else
-      span.text-danger  Oczekujące
-
-   p #[strong Utworzone:] #{plan.date_created}
-   p #[strong Opis:] #{plan.desc}
-   p #[strong Zaplanował:] #{plan.user.fullname}
-   p #[strong Data realizacji:] #{plan.date_execution}
-   p #[strong Zmiana realizująca plan:] #{plan.shift}
+    p #[strong Utworzone:] #{plan.virtual_date_created}
+    p #[strong Opis:] #{plan.desc}
+    p #[strong Zaplanował:] #{plan.user.fullname}
+    p #[strong Data realizacji:] #{plan.virtual_date_execution}
+    p #[strong Zmiana realizująca plan:] #{plan.shift}
 
 
-    hr
-    p 
-    a(href=plan.url + '/delete') Usuń Plan
-    p
-    a(href=plan.url+'/update') Zmodyfikuj Plan
+    a.btn.btn-primary.my-5.mr-2(href=plan.url + '/delete') Usuń 
 
-  
+    a.btn.btn-primary.my-5.mr-2(href=plan.url+'/update') Zmodyfikuj 
+
+

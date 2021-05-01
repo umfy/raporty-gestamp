@@ -1,5 +1,186 @@
 extends layout
-
 block content
+  // main display
+  div(class='col mx-md-5')
+    div(class='row')
+      div(class="col-lg-6 my-4")
+        table(class="table table-bordered p-1" id="zeroTable")
+          a(class="btn btn-dark btn-block" type="button" id="zeroButton" style="color:lime") Pracownicy
+          thead
+            tr
+              th(scope="col") Imię
+              th(scope="col") Nazwisko
+              th(scope="col") Specjalizacja
+              th.text-center(scope="col") -
+          tbody
+            each user in user_list
+              if user.shift === 0
+                tr
+                  td #{user.name}
+                  td #{user.surname}
+                  td #{user.spec}
+                  td
+                    button(class="btn btn-danger" type='button' value=user._id onclick="del(this)") -
 
-   h1#id01 Work in Progress
+
+        p.mt-5.text-secondary Zaznacz nagłówek do którego chcesz przenosić elementy.
+        p.text-secondary Po wybraniu elementu, zostanie on przeniesiony do aktywnego nagłówka.
+
+
+      div(class="col-lg-6 my-4")
+        table(class="table table-bordered  p-1" id="oneTable")
+          a(class="btn btn-dark btn-block" type="button" id="oneButton") Poranna
+          thead
+            tr
+              th(scope="col") Imię
+              th(scope="col") Nazwisko
+              th(scope="col") Specjalizacja
+              th.text-center(scope="col") -
+          tbody
+            each user in user_list
+              if user.shift === 1 
+                tr
+                  td #{user.name}
+                  td #{user.surname}
+                  td #{user.spec}
+                  td
+                    button(class="btn btn-danger" type='button' value=user._id onclick="del(this)") -
+
+        table(class="table table-bordered  p-1" id="twoTable")
+          a(class="btn btn-dark btn-block" type="button" id="twoButton") Popołudniowa
+          thead
+            tr
+              th(scope="col") Imię
+              th(scope="col") Nazwisko
+              th(scope="col") Specjalizacja
+              th.text-center(scope="col") -
+          tbody
+            each user in user_list
+              if user.shift === 2 
+                tr
+                  td #{user.name}
+                  td #{user.surname}
+                  td #{user.spec}
+                  td
+                    button(class="btn btn-danger" type='button' value=user._id onclick="del(this)") -
+
+        table(class="table table-bordered p-1 " id="threeTable")
+          a(class="btn btn-dark btn-block" type="button" id="threeButton") Nocna
+          thead
+            tr
+              th(scope="col") Imię
+              th(scope="col") Nazwisko
+              th(scope="col") Specjalizacja
+              th.text-center(scope="col") -
+          tbody
+            each user in user_list
+              if user.shift === 3 
+                tr
+                  td #{user.name}
+                  td #{user.surname}
+                  td #{user.spec}
+                  td
+                    button(class="btn btn-danger" type='button' value=user._id onclick="del(this)") -
+
+      div(class='col-sm-2 mb-5')
+        button.btn.btn-primary.align-self-end(type='button' id='postTransfered' data-toggle="popover" data-placement="right" data-trigger="focus" data-content="Zapisano!") Zapisz
+      
+      //- div(class='col-sm-2 mb-5 align-self-end')
+      //-   button.btn.btn-secondary.align-self-end(type='button' onclick='moveup()') Do góry
+
+      if errors
+        ul
+            for error in errors
+              li!=error.msg
+
+
+  script.
+    // enable popovers
+    $(document).ready(function(){
+      $(function () {
+        $('[data-toggle="popover"]').popover()
+      })
+    })
+  script.
+    $(document).ready(function(){
+      $("#postTransfered").click(function(){
+        $.post("", {transfered: JSON.stringify(transferedUsers)})
+      })
+    })
+
+  script.
+    var transferedUsers = [];
+    var shift_picked = 0;
+    function del(this_cell){
+
+      if (shift_picked == 0){
+        $('#zeroTable tr:last').after('<tr>' + $(this_cell).parents("tr").html() + '</tr>')
+      }
+      if (shift_picked == 1){
+        $('#oneTable tr:last').after('<tr>' + $(this_cell).parents("tr").html() + '</tr>')
+      }
+      if (shift_picked == 2){
+        $('#twoTable tr:last').after('<tr>' + $(this_cell).parents("tr").html() + '</tr>')
+      }
+      if (shift_picked == 3){
+        $('#threeTable tr:last').after('<tr>' + $(this_cell).parents("tr").html() + '</tr>')
+      }
+      // prepare the "transfered Users" list to export
+      if (transferedUsers.length == 0 ){
+        transferedUsers.push([this_cell.value, shift_picked]);
+      }
+      else {
+        for (i= 0; i<transferedUsers.length; i++){
+          var found = false;
+          if (transferedUsers[i][0] === this_cell.value){
+              transferedUsers[i][1] = shift_picked;
+              found = true;
+              break;
+          }
+        }
+        if (!found){
+          transferedUsers.push([this_cell.value, shift_picked]);
+        }
+      }
+      $(this_cell).parents("tr").remove();
+    }
+
+  script.
+    $(document).ready(function(){
+      $("#zeroButton").click(function(){
+        shift_picked = 0
+        document.getElementById('zeroButton').style.color = 'lime'
+        document.getElementById('oneButton').style.color = 'white'
+        document.getElementById('twoButton').style.color = 'white'
+        document.getElementById('threeButton').style.color = 'white'
+      })
+      $("#oneButton").click(function(){
+        shift_picked = 1
+        document.getElementById('zeroButton').style.color = 'white'
+        document.getElementById('oneButton').style.color = 'lime'
+        document.getElementById('twoButton').style.color = 'white'
+        document.getElementById('threeButton').style.color = 'white'
+      })
+      $("#twoButton").click(function(){
+        shift_picked = 2
+        document.getElementById('zeroButton').style.color = 'white'
+        document.getElementById('oneButton').style.color = 'white'
+        document.getElementById('twoButton').style.color = 'lime'
+        document.getElementById('threeButton').style.color = 'white'
+      })
+      $("#threeButton").click(function(){
+        shift_picked = 3
+        document.getElementById('zeroButton').style.color = 'white'
+        document.getElementById('oneButton').style.color = 'white'
+        document.getElementById('twoButton').style.color = 'white'
+        document.getElementById('threeButton').style.color = 'lime'
+      })
+    
+     })
+
+
+
+
+
+
+

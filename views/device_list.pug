@@ -1,11 +1,28 @@
 extends layout
 
 block content
-   h1= title
+   div(class="col mx-md-5 my-5")
+      h1.text-center.mb-5= title
 
-   ul 
-      each device in device_list
-         li
-            a(href=device.url) #{device.name}
+      a.btn.btn-primary.my-2(href="/api/device/create") Utwórz Urządzenie
+
+      each line in line_list
+         table.table.table-bordererd.table-striped.table-hover.dark-header-hover
+            thead.table-dark
+               tr
+                  th.text-center(scope='col' colspan='2') #{line.name}
+                  
+                  
+            tbody
+               each device in device_list
+                  if device.line == line._id.toString()
+                     tr
+                        td.padding0(width="50%") 
+                           a.black-link(href=device.url) #{device.devicetype.name} 
+                        td.padding0
+                           a.black-link(href=device.url) #{device.name}
+
+
+  
       else
          li There are no decives.

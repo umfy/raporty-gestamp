@@ -8,6 +8,7 @@ const user_controller = require('../controllers/userController')
 const device_controller = require('../controllers/deviceController')
 const devicetype_controller = require('../controllers/devicetypeController')
 const line_controller = require('../controllers/lineController')
+const operation_controller = require('../controllers/operationController')
 
 /// DEVICE ROUTES ///
 
@@ -45,26 +46,26 @@ router.post('/devicetype/create', devicetype_controller.devicetype_create_post)
 
 // GET request to delete devicetype
 router.get(
-   '/devicetype/:id/delete',
-   devicetype_controller.devicetype_delete_get
+  '/devicetype/:id/delete',
+  devicetype_controller.devicetype_delete_get
 )
 
 // POST request to delete devicetype
 router.post(
-   '/devicetype/:id/delete',
-   devicetype_controller.devicetype_delete_post
+  '/devicetype/:id/delete',
+  devicetype_controller.devicetype_delete_post
 )
 
 // GET request to update devicetype
 router.get(
-   '/devicetype/:id/update',
-   devicetype_controller.devicetype_update_get
+  '/devicetype/:id/update',
+  devicetype_controller.devicetype_update_get
 )
 
 // POST request to update devicetype
 router.post(
-   '/devicetype/:id/update',
-   devicetype_controller.devicetype_update_post
+  '/devicetype/:id/update',
+  devicetype_controller.devicetype_update_post
 )
 
 // GET request for list of all device items
@@ -99,6 +100,30 @@ router.get('/line', line_controller.line_list)
 // GET request for one device item
 router.get('/line/:id', line_controller.line_detail)
 
+// GET request for creating new line
+router.get('/operation/create', operation_controller.operation_create_get)
+
+// POST request for creating new operation
+router.post('/operation/create', operation_controller.operation_create_post)
+
+// GET request to delete operation
+router.get('/operation/:id/delete', operation_controller.operation_delete_get)
+
+// POST request to delete operation
+router.post('/operation/:id/delete', operation_controller.operation_delete_post)
+
+// GET request to update operation
+router.get('/operation/:id/update', operation_controller.operation_update_get)
+
+// POST request to update operation
+router.post('/operation/:id/update', operation_controller.operation_update_post)
+
+// GET request for list of all device items
+router.get('/operation', operation_controller.operation_list)
+
+// GET request for one device item
+router.get('/operation/:id', operation_controller.operation_detail)
+
 /// PLAN-OWANE PRACE ROUTES ///
 
 // GET request for creating new plan
@@ -130,10 +155,10 @@ router.get('/plan/:id', plan_controller.plan_detail)
 // GET request for list of all raport items
 
 // GET request for creating new raport
-router.get('/raport/create', raport_controller.raport_create_get)
+router.get('/raport/create/:id', raport_controller.raport_create_get)
 
 // POST request for creating new raport
-router.post('/raport/create', raport_controller.raport_create_post)
+router.post('/raport/create/:id', raport_controller.raport_create_post)
 
 // GET request to delete raport
 router.get('/raport/:id/delete', raport_controller.raport_delete_get)
@@ -153,18 +178,33 @@ router.get('/raport', raport_controller.raport_list)
 // GET request for one raport item
 router.get('/raport/:id', raport_controller.raport_detail)
 
+// GET request for one raport item
+router.get('/raport/:id/pdf', raport_controller.raport_detail_pdf)
+
+// pdf download
+router.get('/raport/:id/download', raport_controller.raport_detail_download)
+
 /// SEARCH ROUTES ///
 
 // GET request for search page
-router.get('/search', search_controller.search_page_get)
+router.get('/search/raport', search_controller.search_raport_get)
 
 // POST route to search for specific items
-router.post('/search', search_controller.search_page_post)
+router.post('/search/raport', search_controller.search_raport_post)
+
+// GET request for search page
+router.get('/search/breakdown', search_controller.search_breakdown_get)
+
+// POST route to search for specific items
+router.post('/search/breakdown', search_controller.search_breakdown_post)
 
 /// USERS  ROUTES ///
 
-router.get('/user/team', user_controller.user_team)
+router.get('/user/team', user_controller.user_team_get)
 // GET request for creating new user
+router.post('/user/team', user_controller.user_team_post)
+// GET request for creating new user
+
 router.get('/user/create', user_controller.user_create_get)
 
 // POST request for creating new user
